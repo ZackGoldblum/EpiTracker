@@ -71,10 +71,10 @@ The web application will be available at `http://127.0.0.1:5000/`
 ### Step 1: Create a New Branch
 ```bash
 # Create and switch to a new branch from main
-git checkout -b feature/your-feature-name
+git checkout -b your-feature-name
 
 # Example:
-git checkout -b feature/login-page
+git checkout -b login-page
 ```
 
 ### Step 2: Create a Pull Request
@@ -82,7 +82,7 @@ git checkout -b feature/login-page
 ```bash
 git add .
 git commit -m "Add your changes"
-git push origin feature/your-feature-name
+git push origin your-feature-name
 ```
 
 2. Go to [GitHub](https://github.com/ZackGoldblum/BE-5280-Project) and create a pull request from `your-feature-name` branch to `main`
