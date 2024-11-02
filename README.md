@@ -1,4 +1,23 @@
-# BE-5280-Project: Improving Epilepsy Management in Ambulatory Settings
+# BE 5280 Project
+
+## Overview
+A web application designed to improve epilepsy management in ambulatory settings.
+
+## Project Structure
+```
+BE-5280-Project/
+├── static/                # Static files (CSS, JS, images)
+│   ├── css/               # CSS stylesheets
+│   ├── js/                # JavaScript files
+│   └── images/            # Image assets
+├── templates/             # HTML templates
+│   ├── base.html          # Base template with common layout
+│   └── pages/             # Individual page templates
+├── app.py                 # Main Flask application file
+├── requirements.txt       # Python dependencies
+├── .gitignore             # Git ignore file
+└── README.md              # Project documentation
+```
 
 ## Setup
 

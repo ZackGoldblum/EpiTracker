@@ -1,16 +1,16 @@
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
 
 @app.route("/")
 def home():
-    return "Hello, World!"
+    return render_template("pages/home.html")
 
 
 @app.route("/about")
 def about():
-    return "This is a simple Flask server"
+    return render_template("pages/about.html")
 
 
 if __name__ == "__main__":
