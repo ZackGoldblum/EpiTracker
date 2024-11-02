@@ -3,6 +3,9 @@
 ## Overview
 A web application designed to improve epilepsy management in ambulatory settings.
 
+## Design
+The UI/UX design specifications for this project can be found in our [Figma Design Document](https://www.figma.com/design/xQAEsSvGQf7qSOuBbyZCcJ/BE-5280-Project).
+
 ## Project Structure
 ```
 BE-5280-Project/
