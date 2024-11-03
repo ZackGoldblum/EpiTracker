@@ -4,28 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Flask Demo{% endblock %}</title>
+    <title>{% block title %}Epilepsy Management{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
+    <script src="{{ url_for('static', filename='js/calendar.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/alerts.js') }}" defer></script>
 </head>
-
 <body>
+    {% if request.endpoint not in ['login', 'register'] %}
     <nav>
         <div class="nav-content">
-            <h1>Flask Demo</h1>
+            <a href="{{ url_for('dashboard') }}">
+                <h1>Epilepsy Management</h1>
+            </a>
             <ul>
-                <li><a href="{{ url_for('home') }}">Home</a></li>
-                <li><a href="{{ url_for('about') }}">About</a></li>
+                <li><a href="{{ url_for('dashboard') }}" {% if request.endpoint == 'dashboard' %}class="active"{% endif %}>Dashboard</a></li>
+                <li><a href="{{ url_for('medication_log') }}" {% if request.endpoint == 'medication_log' %}class="active"{% endif %}>Medications</a></li>
+                <li><a href="{{ url_for('seizure_log') }}" {% if request.endpoint == 'seizure_log' %}class="active"{% endif %}>Seizures</a></li>
+                <li><a href="{{ url_for('triggers_log') }}" {% if request.endpoint == 'triggers_log' %}class="active"{% endif %}>Triggers</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
             </ul>
         </div>
     </nav>
-
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer>
-        <p>&copy; 2024 Flask Demo</p>
-    </footer>
+    {% endif %}
+    {% block content %}{% endblock %}
 </body>
 
 </html>

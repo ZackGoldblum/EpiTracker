@@ -1,0 +1,65 @@
+.calendar {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.calendar-day:hover {
+    background-color: var(--secondary-color);
+}
+
+.calendar-day.has-event {
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
+.calendar-day.today {
+    border-color: var(--primary-color);
+    font-weight: bold;
+}
+
+.event-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.event-dot.medication {
+    background-color: var(--primary-color);
+}
+
+.event-dot.seizure {
+    background-color: var(--error-color);
+}
+
+.event-dot.trigger {
+    background-color: #ff9800;
+}
