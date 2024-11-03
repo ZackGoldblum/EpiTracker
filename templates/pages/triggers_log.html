@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Triggers Log{% endblock %}
+
+{% block content %}
+<div class="log-container">
+    <div class="header-section">
+        <h2>Triggers Log</h2>
+        <button class="btn-primary" onclick="showAddTriggerModal()">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Log Trigger
+        </button>
+    </div>
+
+    <div class="calendar-section">
+        <div class="calendar" id="trigger-calendar"></div>
+    </div>
+
+    <div class="log-list">
+        {% for trigger in triggers %}
+        <div class="log-item trigger-item">
+            <div class="log-date">{{ trigger.date_time.strftime('%B %d, %Y - %I:%M %p') }}</div>
+            <div class="log-details">
+                <div class="detail-row">
+                    <span class="detail-label">Type:</span>
+                    <span class="trigger-badge trigger-{{ trigger.type.lower().replace(' ', '-') }}">
+                        {{ trigger.type }}
+                    </span>
+                </div>
+                {% if trigger.notes %}
+                <div class="detail-row">
+                    <span class="detail-label">Notes:</span>
+                    <p class="trigger-notes">{{ trigger.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Add Trigger Modal -->
+<div id="addTriggerModal" class="modal">
+    <div class="modal-content">
+        <h3>Log Trigger</h3>
+        <form method="POST" action="{{ url_for('add_trigger') }}">
+            <div class="form-group">
+                <label for="trigger-datetime">Date & Time</label>
+                <input type="datetime-local" id="trigger-datetime" name="date_time" required>
+            </div>
+            <div class="form-group">
+                <label for="trigger-type">Type</label>
+                <select id="trigger-type" name="type" required>
+                    <option value="Stress">Stress</option>
+                    <option value="Lack of Sleep">Lack of Sleep</option>
+                    <option value="Missed Medication">Missed Medication</option>
+                    <option value="Alcohol">Alcohol</option>
+                    <option value="Flashing Lights">Flashing Lights</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="trigger-notes">Notes</label>
+                <textarea id="trigger-notes" name="notes" rows="3"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="submit" class="btn-primary">Log Trigger</button>
+                <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

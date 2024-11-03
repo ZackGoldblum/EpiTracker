@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Welcome, {{ current_user.username }}</h2>
+
+    <div class="dashboard-grid">
+        <div class="card">
+            <h3>Medication Schedule</h3>
+            <div class="calendar" id="medication-calendar"></div>
+            <a href="{{ url_for('medication_log') }}" class="btn-secondary">View All</a>
+        </div>
+
+        <div class="card">
+            <h3>Recent Seizures</h3>
+            <div class="calendar" id="seizure-calendar"></div>
+            <a href="{{ url_for('seizure_log') }}" class="btn-secondary">View All</a>
+        </div>
+
+        <div class="card">
+            <h3>Trigger Log</h3>
+            <div class="calendar" id="trigger-calendar"></div>
+            <a href="{{ url_for('triggers_log') }}" class="btn-secondary">View All</a>
+        </div>
+    </div>
+</div>
+
+<div id="dailyLogsModal" class="modal">
+    <div class="modal-content">
+        <h3>Logs for <span id="selectedDate"></span></h3>
+        <div id="dailyLogs">
+            <div id="medicationLogs"></div>
+            <div id="seizureLogs"></div>
+            <div id="triggerLogs"></div>
+        </div>
+        <button type="button" class="btn-secondary" onclick="closeModal()">Close</button>
+    </div>
+</div>
+{% endblock %}
