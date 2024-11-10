@@ -48,16 +48,16 @@
         <h3>Add New Medication</h3>
         <form method="POST" action="{{ url_for('add_medication') }}">
             <div class="form-group">
+                <label for="med-datetime">Date & Time</label>
+                <input type="datetime-local" id="med-datetime" name="datetime" required>
+            </div>
+            <div class="form-group">
                 <label for="med-name">Medication Name</label>
                 <input type="text" id="med-name" name="name" required>
             </div>
             <div class="form-group">
                 <label for="med-dosage">Dosage</label>
                 <input type="text" id="med-dosage" name="dosage" required>
-            </div>
-            <div class="form-group">
-                <label for="med-datetime">Date & Time</label>
-                <input type="datetime-local" id="med-datetime" name="datetime" required>
             </div>
             <div class="modal-actions">
                 <button type="submit" class="btn-primary">Add Medication</button>
