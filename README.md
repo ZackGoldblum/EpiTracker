@@ -22,8 +22,10 @@ BE-5280-Project/
 │   │   ├── style.css               # Main stylesheet
 │   │   └── calendar.css            # Calendar-specific styles
 │   ├── js/                         # JavaScript files
+│   │   ├── alerts.js               # Alert system
 │   │   ├── calendar.js             # Calendar functionality
-│   │   └── alerts.js               # Alert system
+│   │   ├── form-utils.js           # Form utilities
+│   │   └── mobile_nav.js           # Mobile navigation
 │   └── images/                     # Image assets
 ├── templates/                      # HTML templates
 │   ├── base.html                   # Base template with common layout
