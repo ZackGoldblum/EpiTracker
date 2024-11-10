@@ -37,7 +37,7 @@ class Calendar {
             });
             
             document.getElementById('selectedDate').textContent = displayDate;
-            
+
             // Render medications
             const medHtml = data.medications.length ? 
                 data.medications.map(med => `
@@ -56,7 +56,7 @@ class Calendar {
                         <div>Duration: ${seizure.duration} minutes</div>
                     </div>
                 `).join('') : '<p class="no-logs">No seizures logged</p>';
-            
+
             // Render triggers
             const triggerHtml = data.triggers.length ?
                 data.triggers.map(trigger => `
@@ -66,22 +66,48 @@ class Calendar {
                     </div>
                 `).join('') : '<p class="no-logs">No triggers logged</p>';
 
-            // Update modal content
-            document.getElementById('medicationLogs').innerHTML = `
-                <div class="daily-log-section">
-                    <h4>Medications</h4>
-                    ${medHtml}
-                </div>`;
-            document.getElementById('seizureLogs').innerHTML = `
-                <div class="daily-log-section">
-                    <h4>Seizures</h4>
-                    ${seizureHtml}
-                </div>`;
-            document.getElementById('triggerLogs').innerHTML = `
-                <div class="daily-log-section">
-                    <h4>Triggers</h4>
-                    ${triggerHtml}
-                </div>`;
+            // Check if we're on a specific log page or dashboard
+            const isDashboard = document.querySelector('.dashboard-grid');
+            
+            if (isDashboard) {
+                // Update all sections for dashboard
+                document.getElementById('medicationLogs').innerHTML = `
+                    <div class="daily-log-section">
+                        <h4>Medications</h4>
+                        ${medHtml}
+                    </div>`;
+                document.getElementById('seizureLogs').innerHTML = `
+                    <div class="daily-log-section">
+                        <h4>Seizures</h4>
+                        ${seizureHtml}
+                    </div>`;
+                document.getElementById('triggerLogs').innerHTML = `
+                    <div class="daily-log-section">
+                        <h4>Triggers</h4>
+                        ${triggerHtml}
+                    </div>`;
+            } else {
+                // On individual pages, only show relevant section
+                if (this.type === 'medication') {
+                    document.getElementById('medicationLogs').innerHTML = `
+                        <div class="daily-log-section">
+                            <h4>Medications</h4>
+                            ${medHtml}
+                        </div>`;
+                } else if (this.type === 'seizure') {
+                    document.getElementById('seizureLogs').innerHTML = `
+                        <div class="daily-log-section">
+                            <h4>Seizures</h4>
+                            ${seizureHtml}
+                        </div>`;
+                } else if (this.type === 'trigger') {
+                    document.getElementById('triggerLogs').innerHTML = `
+                        <div class="daily-log-section">
+                            <h4>Triggers</h4>
+                            ${triggerHtml}
+                        </div>`;
+                }
+            }
 
             // Show the modal
             document.getElementById('dailyLogsModal').style.display = 'block';
@@ -317,3 +343,31 @@ async function showDailyLogs(date) {
         console.error('Error fetching daily logs:', error);
     }
 }
+
+// Add this after the Calendar class definition
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize all calendars
+    const calendars = {
+        'medication-calendar': new Calendar('medication-calendar', 'medication'),
+        'seizure-calendar': new Calendar('seizure-calendar', 'seizure'),
+        'trigger-calendar': new Calendar('trigger-calendar', 'trigger')
+    };
+
+    // Add modal HTML to each log page if it doesn't exist
+    if (!document.getElementById('dailyLogsModal')) {
+        const modalHTML = `
+            <div id="dailyLogsModal" class="modal">
+                <div class="modal-content">
+                    <h3>Logs for <span id="selectedDate"></span></h3>
+                    <div id="dailyLogs">
+                        <div id="medicationLogs"></div>
+                        <div id="seizureLogs"></div>
+                        <div id="triggerLogs"></div>
+                    </div>
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Close</button>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+});
