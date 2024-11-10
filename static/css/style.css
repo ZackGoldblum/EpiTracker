@@ -86,9 +86,9 @@ nav a.active {
 nav a[href*="logout"] {
     color: #e74c3c;
     border: 1px solid #e74c3c;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
     border-radius: 8px;
-    margin-left: 1rem;
+    margin-left: 0;
 }
 
 nav a[href*="logout"]:hover {
