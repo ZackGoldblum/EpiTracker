@@ -700,3 +700,98 @@ h2 {
     height: 60px;
     position: relative;
 }
+
+/* Mobile menu button */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: block;
+    }
+
+    .nav-content {
+        padding: 0 1rem;
+    }
+
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-links.show {
+        display: flex;
+    }
+
+    .nav-links li {
+        width: 100%;
+    }
+
+    .nav-links a {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        display: block;
+    }
+
+    /* Dashboard grid */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        padding: 0 1rem;
+        gap: 1rem;
+    }
+
+    /* Calendar adjustments */
+    .calendar {
+        font-size: 0.875rem;
+        padding: 0.5rem;
+    }
+
+    /* Form adjustments */
+    .auth-card,
+    .modal-content {
+        width: 90%;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+
+    /* Auth title */
+    .auth-title {
+        font-size: 2rem;
+        padding: 0 1rem;
+    }
+
+    .auth-title span {
+        font-size: 1rem;
+    }
+
+    /* Container padding */
+    .container,
+    .log-container {
+        padding: 1rem;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .nav-content h1 {
+        font-size: 1.25rem;
+    }
+
+    .auth-title {
+        font-size: 1.75rem;
+    }
+}
