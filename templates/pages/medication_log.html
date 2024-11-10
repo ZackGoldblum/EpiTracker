@@ -18,24 +18,25 @@
         <div class="calendar" id="medication-calendar"></div>
     </div>
 
-    <div class="medication-list">
+    <div class="log-list">
         {% for med in medications %}
-        <div class="medication-item">
-            <div class="med-info">
-                <h3>{{ med.name }}</h3>
-                <p>Dosage: {{ med.dosage }}</p>
-                <p>Time: {{ med.time.strftime('%I:%M %p') }}</p>
-            </div>
-            <div class="med-actions">
-                <span class="status-badge {{ 'status-taken' if med.taken else 'status-pending' }}">
-                    {{ 'Taken' if med.taken else 'Pending' }}
-                </span>
-                <label class="med-checkbox">
-                    <input type="checkbox" 
-                           {% if med.taken %}checked{% endif %}
-                           onchange="updateMedicationStatus('{{ med.id }}', this)">
-                    <span class="checkmark"></span>
-                </label>
+        <div class="log-item medication-item">
+            <div class="log-date">{{ med.time.strftime('%B %d, %Y - %I:%M %p') }}</div>
+            <div class="log-details">
+                <div class="detail-row">
+                    <span class="detail-label">Medication:</span>
+                    <span>{{ med.name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Dosage:</span>
+                    <span>{{ med.dosage }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="status-badge {{ 'status-taken' if med.taken else 'status-pending' }}">
+                        {{ 'Taken' if med.taken else 'Pending' }}
+                    </span>
+                </div>
             </div>
         </div>
         {% endfor %}
@@ -45,7 +46,7 @@
 <!-- Add Medication Modal -->
 <div id="addMedicationModal" class="modal">
     <div class="modal-content">
-        <h3>Add New Medication</h3>
+        <h3>Add Medication</h3>
         <form method="POST" action="{{ url_for('add_medication') }}">
             <div class="form-group">
                 <label for="med-datetime">Date & Time</label>
@@ -61,7 +62,7 @@
             </div>
             <div class="modal-actions">
                 <button type="submit" class="btn-primary">Add Medication</button>
-                <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                <button type="button" class="btn-secondary cancel-button" onclick="closeModal()">Cancel</button>
             </div>
         </form>
     </div>
