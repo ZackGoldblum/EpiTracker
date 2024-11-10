@@ -43,33 +43,39 @@ class Calendar {
                 // Update modal content for dashboard
                 document.getElementById('selectedDate').textContent = displayDate;
                 
-                // Update medication logs with time at the top
+                // Update medication logs with styled time at the top
                 const medLogsHtml = data.medications.length ? 
                     data.medications.map(med => `
                         <div class="daily-log-item">
-                            <div>${formatTime(med.time)}</div>
-                            <strong>${med.name}</strong> - ${med.dosage}
+                            <div class="log-time-display">${formatTime(med.time)}</div>
+                            <div class="log-content">
+                                <strong>${med.name}</strong> - ${med.dosage}
+                            </div>
                         </div>
                     `).join('') : '<p class="no-logs">No medications logged</p>';
                 
-                // Update seizure logs with formatted time
+                // Update seizure logs with styled time
                 const seizureLogsHtml = data.seizures.length ?
                     data.seizures.map(seizure => `
                         <div class="daily-log-item">
-                            <div>${formatTime(seizure.date_time)}</div>
-                            <div>Type: ${seizure.type}</div>
-                            <div>Severity: ${seizure.severity}/10</div>
-                            <div>Duration: ${seizure.duration} minutes</div>
+                            <div class="log-time-display">${formatTime(seizure.date_time)}</div>
+                            <div class="log-content">
+                                <div>Type: ${seizure.type}</div>
+                                <div>Severity: ${seizure.severity}/10</div>
+                                <div>Duration: ${seizure.duration} minutes</div>
+                            </div>
                         </div>
                     `).join('') : '<p class="no-logs">No seizures logged</p>';
                 
-                // Update trigger logs with formatted time
+                // Update trigger logs with styled time
                 const triggerLogsHtml = data.triggers.length ?
                     data.triggers.map(trigger => `
                         <div class="daily-log-item">
-                            <div>${formatTime(trigger.date_time)}</div>
-                            <div>Type: ${trigger.type}</div>
-                            <div>Notes: ${trigger.notes || 'No notes'}</div>
+                            <div class="log-time-display">${formatTime(trigger.date_time)}</div>
+                            <div class="log-content">
+                                <div>Type: ${trigger.type}</div>
+                                <div>Notes: ${trigger.notes || 'No notes'}</div>
+                            </div>
                         </div>
                     `).join('') : '<p class="no-logs">No triggers logged</p>';
 

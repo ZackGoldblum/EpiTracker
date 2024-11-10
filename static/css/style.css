@@ -450,7 +450,7 @@ h2 {
 }
 
 .daily-log-section {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--border-color);
 }
@@ -821,16 +821,44 @@ h2 {
 }
 
 .log-time {
-    color: var(--text-muted);
+    font-weight: 500;
+    color: var(--text-color);
     font-size: 0.9rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding: 4px 8px;
+    background-color: #dee1f3;
+    border-radius: 4px;
+    display: inline-block;
 }
 
 .daily-log-section {
-    margin-bottom: 2rem;
+    margin-top: 1rem;
 }
 
 .daily-log-section h4 {
-    margin-bottom: 1rem;
     color: var(--text-color);
+}
+
+.log-time-display {
+    font-weight: 500;
+    color: var(--text-muted);
+    font-size: 0.9em;
+    margin-bottom: 4px;
+    padding: 2px 6px;
+    background-color: #dee1f3;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.daily-log-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.log-content {
+    margin-top: 4px;
+}
+
+.daily-log-item:last-child {
+    border-bottom: none;
 }
