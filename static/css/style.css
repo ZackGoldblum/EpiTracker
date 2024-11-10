@@ -132,7 +132,7 @@ main {
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
     margin-top: 2rem;
     padding: 0 2rem;
@@ -782,6 +782,10 @@ h2 {
     .container,
     .log-container {
         padding: 1rem;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
     }
 }
 
