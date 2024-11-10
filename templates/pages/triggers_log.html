@@ -34,18 +34,34 @@
             </div>
             <div class="form-group">
                 <label for="trigger-type">Type</label>
-                <select id="trigger-type" name="type" required>
+                <select id="trigger-type" name="type" required onchange="handleTriggerSelect(this)">
+                    <option value="">Select Trigger</option>
                     <option value="Stress">Stress</option>
                     <option value="Lack of Sleep">Lack of Sleep</option>
                     <option value="Missed Medication">Missed Medication</option>
                     <option value="Alcohol">Alcohol</option>
                     <option value="Flashing Lights">Flashing Lights</option>
-                    <option value="Other">Other</option>
+                    <option value="Illness/Fever">Illness/Fever</option>
+                    <option value="Menstruation">Menstruation</option>
+                    <option value="Dehydration">Dehydration</option>
+                    <option value="Exercise">Exercise</option>
+                    <option value="Anxiety">Anxiety</option>
+                    <option value="custom">+ Add Custom Trigger</option>
                 </select>
+                <input type="text" 
+                       id="custom-trigger-type" 
+                       name="custom_type" 
+                       placeholder="Enter trigger type"
+                       style="display: none; margin-top: 0.5rem;">
             </div>
             <div class="form-group">
                 <label for="trigger-notes">Notes</label>
-                <textarea id="trigger-notes" name="notes" rows="3"></textarea>
+                <div class="trigger-notes-container">
+                    <textarea id="trigger-notes" name="notes" rows="3" placeholder="Add any additional details..."></textarea>
+                    <div class="quick-notes" id="quick-notes">
+                        <!-- Quick note suggestions will be added based on trigger type -->
+                    </div>
+                </div>
             </div>
             <div class="modal-actions">
                 <button type="submit" class="btn-primary">Log Trigger</button>

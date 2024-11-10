@@ -34,11 +34,31 @@
             </div>
             <div class="form-group">
                 <label for="med-name">Medication Name</label>
-                <input type="text" id="med-name" name="name" required>
+                <select id="med-name" name="name" required onchange="handleMedicationSelect(this)">
+                    <option value="">Select medication</option>
+                    <option value="Levetiracetam">Levetiracetam (Keppra)</option>
+                    <option value="Lamotrigine">Lamotrigine (Lamictal)</option>
+                    <option value="Carbamazepine">Carbamazepine (Tegretol)</option>
+                    <option value="Valproate">Valproate (Depakote)</option>
+                    <option value="Oxcarbazepine">Oxcarbazepine (Trileptal)</option>
+                    <option value="custom">+ Add Custom Medication</option>
+                </select>
+                <input type="text" id="custom-med-name" name="custom_name" 
+                       placeholder="Enter medication name" 
+                       style="display: none; margin-top: 0.5rem;">
             </div>
             <div class="form-group">
                 <label for="med-dosage">Dosage</label>
-                <input type="text" id="med-dosage" name="dosage" required>
+                <div class="dosage-input-group">
+                    <input type="number" id="med-dosage-value" name="dosage_value" 
+                           required min="0" step="any" class="dosage-value" value="1">
+                    <select id="med-dosage-unit" name="dosage_unit" required class="dosage-unit">
+                        <option value="mg">mg</option>
+                        <option value="g">g</option>
+                        <option value="ml">ml</option>
+                        <option value="tablet">tablet(s)</option>
+                    </select>
+                </div>
             </div>
             <div class="modal-actions">
                 <button type="submit" class="btn-primary">Add Medication</button>

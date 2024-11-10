@@ -34,22 +34,57 @@
             </div>
             <div class="form-group">
                 <label for="seizure-type">Type</label>
-                <select id="seizure-type" name="type" required>
-                    <option value="Tonic-Clonic">Tonic-Clonic</option>
-                    <option value="Absence">Absence</option>
-                    <option value="Focal">Focal</option>
+                <select id="seizure-type" name="type" required onchange="handleSeizureTypeSelect(this)">
+                    <option value="">Select Type</option>
+                    <option value="Tonic-Clonic">Tonic-Clonic (Grand Mal)</option>
+                    <option value="Absence">Absence (Petit Mal)</option>
+                    <option value="Focal">Focal (Partial)</option>
                     <option value="Myoclonic">Myoclonic</option>
-                    <option value="Other">Other</option>
+                    <option value="Atonic">Atonic (Drop)</option>
+                    <option value="Clonic">Clonic</option>
+                    <option value="Tonic">Tonic</option>
+                    <option value="custom">+ Add Custom Type</option>
                 </select>
+                <input type="text" 
+                       id="custom-seizure-type" 
+                       name="custom_type" 
+                       placeholder="Enter seizure type"
+                       style="display: none; margin-top: 0.5rem;">
             </div>
             <div class="form-group">
                 <label for="seizure-severity">Severity (1-10)</label>
-                <input type="range" id="seizure-severity" name="severity" min="1" max="10" value="5">
-                <output for="seizure-severity">5</output>
+                <div class="slider-container">
+                    <input type="range" 
+                           id="seizure-severity" 
+                           name="severity" 
+                           min="1" 
+                           max="10" 
+                           value="5"
+                           oninput="updateSeverityValue(this.value)">
+                    <span id="severity-value">5</span>
+                </div>
             </div>
             <div class="form-group">
-                <label for="seizure-duration">Duration (minutes)</label>
-                <input type="number" id="seizure-duration" name="duration" min="1" required>
+                <label for="seizure-duration">Duration</label>
+                <div class="duration-input-container">
+                    <div class="duration-number-input">
+                        <input type="number" 
+                               id="seizure-duration" 
+                               name="duration" 
+                               min="1" 
+                               value="1" 
+                               required>
+                        <span class="duration-unit">minutes</span>
+                    </div>
+                    <div class="duration-quick-select">
+                        <button type="button" class="duration-btn" onclick="setDuration(1)">1m</button>
+                        <button type="button" class="duration-btn" onclick="setDuration(2)">2m</button>
+                        <button type="button" class="duration-btn" onclick="setDuration(5)">5m</button>
+                        <button type="button" class="duration-btn" onclick="setDuration(10)">10m</button>
+                        <button type="button" class="duration-btn" onclick="setDuration(15)">15m</button>
+                        <button type="button" class="duration-btn" onclick="setDuration(30)">30m</button>
+                    </div>
+                </div>
             </div>
             <div class="modal-actions">
                 <button type="submit" class="btn-primary">Log Seizure</button>

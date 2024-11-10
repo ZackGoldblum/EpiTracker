@@ -862,3 +862,151 @@ h2 {
 .daily-log-item:last-child {
     border-bottom: none;
 }
+
+.dosage-input-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.dosage-value {
+    width: 100px !important;
+}
+
+.dosage-unit {
+    width: 100px !important;
+}
+
+#med-name {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: white;
+}
+
+#custom-med-name {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+#seizure-type {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: white;
+}
+
+#custom-seizure-type {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.duration-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.duration-number-input {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+}
+
+.duration-number-input input {
+    width: 60px;
+    border: none;
+    padding: 0.25rem;
+    -moz-appearance: textfield; /* Firefox */
+}
+
+.duration-number-input input::-webkit-outer-spin-button,
+.duration-number-input input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.duration-unit {
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.duration-quick-select {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.duration-btn {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.duration-btn:hover {
+    background: var(--secondary-color);
+    border-color: var(--primary-color);
+}
+
+.duration-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.trigger-notes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.quick-notes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.quick-note-btn {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.quick-note-btn:hover {
+    background: var(--secondary-color);
+    border-color: var(--primary-color);
+}
+
+.quick-note-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+#trigger-notes {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 80px;
+}
