@@ -43,7 +43,11 @@ class Calendar {
                 data.medications.map(med => `
                     <div class="daily-log-item">
                         <strong>${med.name}</strong> - ${med.dosage}
-                        <div>${new Date(med.time).toLocaleTimeString()}</div>
+                        <div>${new Date(med.time).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                        })}</div>
                     </div>
                 `).join('') : '<p class="no-logs">No medications logged</p>';
             
@@ -52,6 +56,11 @@ class Calendar {
                 data.seizures.map(seizure => `
                     <div class="daily-log-item">
                         <div>Type: ${seizure.type}</div>
+                        <div>Time: ${new Date(seizure.date_time).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                        })}</div>
                         <div>Severity: ${seizure.severity}/10</div>
                         <div>Duration: ${seizure.duration} minutes</div>
                     </div>
@@ -62,6 +71,11 @@ class Calendar {
                 data.triggers.map(trigger => `
                     <div class="daily-log-item">
                         <div>Type: ${trigger.type}</div>
+                        <div>Time: ${new Date(trigger.date_time).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                        })}</div>
                         <div>Notes: ${trigger.notes || 'No notes'}</div>
                     </div>
                 `).join('') : '<p class="no-logs">No triggers logged</p>';
