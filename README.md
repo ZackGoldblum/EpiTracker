@@ -39,6 +39,8 @@ BE-5280-Project/
 ├── models/                         # Database models
 │   └── database.py                 # SQLAlchemy models
 ├── app.py                          # Main Flask application file
+├── init_db.py                      # Database initialization script
+├── simulate_patient.py             # Script to seed the database with demo data
 ├── requirements.txt                # Python dependencies
 ├── .gitignore                      # Git ignore file
 └── README.md                       # Project documentation
@@ -80,6 +82,11 @@ pip install -r requirements.txt
 ### 4. Initialize the Database
 ```bash
 python init-db.py
+```
+
+To initialize the database with demo patient data:
+```bash
+python init_db.py --demo
 ```
 
 ### 5. Run the Web Application
