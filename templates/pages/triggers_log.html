@@ -18,26 +18,8 @@
         <div class="calendar" id="trigger-calendar"></div>
     </div>
 
-    <div class="log-list">
-        {% for trigger in triggers %}
-        <div class="log-item trigger-item">
-            <div class="log-date">{{ trigger.date_time.strftime('%B %d, %Y - %I:%M %p') }}</div>
-            <div class="log-details">
-                <div class="detail-row">
-                    <span class="detail-label">Type:</span>
-                    <span class="trigger-badge trigger-{{ trigger.type.lower().replace(' ', '-') }}">
-                        {{ trigger.type }}
-                    </span>
-                </div>
-                {% if trigger.notes %}
-                <div class="detail-row">
-                    <span class="detail-label">Notes:</span>
-                    <p class="trigger-notes">{{ trigger.notes }}</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
+    <div id="selected-day-logs" class="log-list">
+        <p class="no-logs">Select a day in the calendar to view logs</p>
     </div>
 </div>
 

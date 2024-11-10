@@ -18,28 +18,8 @@
         <div class="calendar" id="medication-calendar"></div>
     </div>
 
-    <div class="log-list">
-        {% for med in medications %}
-        <div class="log-item medication-item">
-            <div class="log-date">{{ med.time.strftime('%B %d, %Y - %I:%M %p') }}</div>
-            <div class="log-details">
-                <div class="detail-row">
-                    <span class="detail-label">Medication:</span>
-                    <span>{{ med.name }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Dosage:</span>
-                    <span>{{ med.dosage }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Status:</span>
-                    <span class="status-badge {{ 'status-taken' if med.taken else 'status-pending' }}">
-                        {{ 'Taken' if med.taken else 'Pending' }}
-                    </span>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+    <div id="selected-day-logs" class="log-list">
+        <p class="no-logs">Select a day in the calendar to view logs</p>
     </div>
 </div>
 

@@ -29,102 +29,147 @@ class Calendar {
             const data = await response.json();
             
             // Format date for display
-            const displayDate = new Date(dateStr).toLocaleDateString('en-US', {
+            const displayDate = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             });
-            
-            document.getElementById('selectedDate').textContent = displayDate;
 
-            // Render medications
-            const medHtml = data.medications.length ? 
-                data.medications.map(med => `
-                    <div class="daily-log-item">
-                        <strong>${med.name}</strong> - ${med.dosage}
-                        <div>${new Date(med.time).toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                            hour12: true
-                        })}</div>
-                    </div>
-                `).join('') : '<p class="no-logs">No medications logged</p>';
-            
-            // Render seizures
-            const seizureHtml = data.seizures.length ?
-                data.seizures.map(seizure => `
-                    <div class="daily-log-item">
-                        <div>Type: ${seizure.type}</div>
-                        <div>Time: ${new Date(seizure.date_time).toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                            hour12: true
-                        })}</div>
-                        <div>Severity: ${seizure.severity}/10</div>
-                        <div>Duration: ${seizure.duration} minutes</div>
-                    </div>
-                `).join('') : '<p class="no-logs">No seizures logged</p>';
-
-            // Render triggers
-            const triggerHtml = data.triggers.length ?
-                data.triggers.map(trigger => `
-                    <div class="daily-log-item">
-                        <div>Type: ${trigger.type}</div>
-                        <div>Time: ${new Date(trigger.date_time).toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                            hour12: true
-                        })}</div>
-                        <div>Notes: ${trigger.notes || 'No notes'}</div>
-                    </div>
-                `).join('') : '<p class="no-logs">No triggers logged</p>';
-
-            // Check if we're on a specific log page or dashboard
+            // Check if we're on the dashboard or a specific log page
             const isDashboard = document.querySelector('.dashboard-grid');
             
             if (isDashboard) {
-                // Update all sections for dashboard
+                // Update modal content for dashboard
+                document.getElementById('selectedDate').textContent = displayDate;
+                
+                // Update medication logs with original styling
+                const medLogsHtml = data.medications.length ? 
+                    data.medications.map(med => `
+                        <div class="daily-log-item">
+                            <strong>${med.name}</strong> - ${med.dosage}
+                            <div>${new Date(med.time).toLocaleTimeString()}</div>
+                        </div>
+                    `).join('') : '<p class="no-logs">No medications logged</p>';
+                
+                // Update seizure logs with original styling
+                const seizureLogsHtml = data.seizures.length ?
+                    data.seizures.map(seizure => `
+                        <div class="daily-log-item">
+                            <div>Type: ${seizure.type}</div>
+                            <div>Severity: ${seizure.severity}/10</div>
+                            <div>Duration: ${seizure.duration} minutes</div>
+                        </div>
+                    `).join('') : '<p class="no-logs">No seizures logged</p>';
+                
+                // Update trigger logs with original styling
+                const triggerLogsHtml = data.triggers.length ?
+                    data.triggers.map(trigger => `
+                        <div class="daily-log-item">
+                            <div>Type: ${trigger.type}</div>
+                            <div>Notes: ${trigger.notes || 'No notes'}</div>
+                        </div>
+                    `).join('') : '<p class="no-logs">No triggers logged</p>';
+
+                // Insert the HTML for dashboard
                 document.getElementById('medicationLogs').innerHTML = `
                     <div class="daily-log-section">
                         <h4>Medications</h4>
-                        ${medHtml}
+                        ${medLogsHtml}
                     </div>`;
                 document.getElementById('seizureLogs').innerHTML = `
                     <div class="daily-log-section">
                         <h4>Seizures</h4>
-                        ${seizureHtml}
+                        ${seizureLogsHtml}
                     </div>`;
                 document.getElementById('triggerLogs').innerHTML = `
                     <div class="daily-log-section">
                         <h4>Triggers</h4>
-                        ${triggerHtml}
+                        ${triggerLogsHtml}
                     </div>`;
             } else {
-                // On individual pages, only show relevant section
-                if (this.type === 'medication') {
-                    document.getElementById('medicationLogs').innerHTML = `
-                        <div class="daily-log-section">
-                            <h4>Medications</h4>
-                            ${medHtml}
-                        </div>`;
-                } else if (this.type === 'seizure') {
-                    document.getElementById('seizureLogs').innerHTML = `
-                        <div class="daily-log-section">
-                            <h4>Seizures</h4>
-                            ${seizureHtml}
-                        </div>`;
-                } else if (this.type === 'trigger') {
-                    document.getElementById('triggerLogs').innerHTML = `
-                        <div class="daily-log-section">
-                            <h4>Triggers</h4>
-                            ${triggerHtml}
-                        </div>`;
+                // Individual pages: show detailed logs with date
+                const logsSection = document.getElementById('selected-day-logs');
+                if (logsSection) {
+                    if (this.type === 'medication') {
+                        const medHtml = data.medications.length ? 
+                            `<div class="log-date-section">
+                                <h3>${displayDate}</h3>
+                             </div>
+                             ${data.medications.map(med => `
+                                <div class="log-item">
+                                    <div class="log-time">${formatDateTime(med.time)}</div>
+                                    <div class="log-item-details">
+                                        <div class="log-item-row">
+                                            <span class="log-item-label">Medication:</span>
+                                            <span>${med.name}</span>
+                                        </div>
+                                        <div class="log-item-row">
+                                            <span class="log-item-label">Dosage:</span>
+                                            <span>${med.dosage}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                             `).join('')}` : 
+                            `<p class="no-logs"><em>There are no logs for ${displayDate}</em></p>`;
+                        logsSection.innerHTML = medHtml;
+                    } else if (this.type === 'seizure') {
+                        const seizureHtml = data.seizures.length ?
+                            `<div class="log-date-section">
+                                <h3>${displayDate}</h3>
+                             </div>
+                             ${data.seizures.map(seizure => `
+                                <div class="log-item">
+                                    <div class="log-time">${formatDateTime(seizure.date_time)}</div>
+                                    <div class="log-item-details">
+                                        <div class="log-item-row">
+                                            <span class="log-item-label">Type:</span>
+                                            <span>${seizure.type}</span>
+                                        </div>
+                                        <div class="log-item-row">
+                                            <span class="log-item-label">Severity:</span>
+                                            <span>${seizure.severity}/10</span>
+                                        </div>
+                                        <div class="log-item-row">
+                                            <span class="log-item-label">Duration:</span>
+                                            <span>${seizure.duration} minutes</span>
+                                        </div>
+                                    </div>
+                                </div>
+                             `).join('')}` :
+                            `<p class="no-logs"><em>There are no logs for ${displayDate}</em></p>`;
+                        logsSection.innerHTML = seizureHtml;
+                    } else if (this.type === 'trigger') {
+                        const triggerHtml = data.triggers.length ?
+                            `<div class="log-date-section">
+                                <h3>${displayDate}</h3>
+                             </div>
+                             ${data.triggers.map(trigger => `
+                                <div class="log-item">
+                                    <div class="log-time">${formatDateTime(trigger.date_time)}</div>
+                                    <div class="log-item-details">
+                                        <div class="log-item-row">
+                                            <span class="log-item-label">Type:</span>
+                                            <span>${trigger.type}</span>
+                                        </div>
+                                        <div class="log-item-row">
+                                            <span class="log-item-label">Notes:</span>
+                                            <span>${trigger.notes || 'No notes'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                             `).join('')}` :
+                            `<p class="no-logs"><em>There are no logs for ${displayDate}</em></p>`;
+                        logsSection.innerHTML = triggerHtml;
+                    }
                 }
             }
 
-            // Show the modal
-            document.getElementById('dailyLogsModal').style.display = 'block';
+            // Show the modal only for dashboard view
+            if (isDashboard) {
+                document.getElementById('dailyLogsModal').style.display = 'block';
+            }
+
         } catch (error) {
             console.error('Error fetching daily logs:', error);
         }
@@ -385,3 +430,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
 });
+
+function formatDateTime(dateTimeStr) {
+    const date = new Date(dateTimeStr);
+    return date.toLocaleString('en-US', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        hour12: true
+    });
+}

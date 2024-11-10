@@ -18,29 +18,8 @@
         <div class="calendar" id="seizure-calendar"></div>
     </div>
 
-    <div class="log-list">
-        {% for seizure in seizures %}
-        <div class="log-item seizure-item">
-            <div class="log-date">{{ seizure.date_time.strftime('%B %d, %Y - %I:%M %p') }}</div>
-            <div class="log-details">
-                <div class="detail-row">
-                    <span class="detail-label">Type:</span>
-                    <span class="severity-badge severity-{{ seizure.type.lower() }}">{{ seizure.type }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Severity:</span>
-                    <div class="severity-meter">
-                        <div class="severity-fill" style="width: '{{ seizure.severity * 10 }}%'"></div>
-                        <span class="severity-text">{{ seizure.severity }}/10</span>
-                    </div>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Duration:</span>
-                    <span>{{ seizure.duration }} minutes</span>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+    <div id="selected-day-logs" class="log-list">
+        <p class="no-logs">Select a day in the calendar to view logs</p>
     </div>
 </div>
 
