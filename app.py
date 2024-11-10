@@ -87,17 +87,21 @@ def get_events(event_type):
 @login_required
 def add_medication():
     try:
-        name = request.form.get("name")
-        dosage = request.form.get("dosage")
-        datetime_str = request.form.get("datetime")
+        # Get the medication name (either from select or custom input)
+        name = request.form.get("name") or request.form.get("custom_name")
         
-        # Convert the datetime string to a datetime object
+        # Combine dosage value and unit
+        dosage_value = request.form.get("dosage_value")
+        dosage_unit = request.form.get("dosage_unit")
+        dosage = f"{dosage_value} {dosage_unit}"
+        
+        datetime_str = request.form.get("datetime")
         medication_datetime = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M')
         
         medication = Medication(
             name=name,
             dosage=dosage,
-            time=medication_datetime,  # Update your model to use 'time' for the full datetime
+            time=medication_datetime,
             user_id=current_user.id
         )
         
@@ -113,29 +117,50 @@ def add_medication():
 @app.route('/add_seizure', methods=['POST'])
 @login_required
 def add_seizure():
-    seizure = Seizure(
-        user_id=current_user.id,
-        date_time=datetime.strptime(request.form['date_time'], '%Y-%m-%dT%H:%M'),
-        type=request.form['type'],
-        severity=int(request.form['severity']),
-        duration=int(request.form['duration'])
-    )
-    db.session.add(seizure)
-    db.session.commit()
-    return redirect(url_for('seizure_log'))
+    try:
+        # Get the seizure type (either from select or custom input)
+        seizure_type = request.form.get("type") or request.form.get("custom_type")
+        
+        seizure = Seizure(
+            user_id=current_user.id,
+            date_time=datetime.strptime(request.form['date_time'], '%Y-%m-%dT%H:%M'),
+            type=seizure_type,
+            severity=int(request.form['severity']),
+            duration=int(request.form['duration'])
+        )
+        db.session.add(seizure)
+        db.session.commit()
+        
+        flash("Seizure logged successfully!")
+        return redirect(url_for('seizure_log'))
+    except Exception as e:
+        flash("Error logging seizure. Please try again.")
+        return redirect(url_for('seizure_log'))
 
-@app.route('/add_trigger', methods=['POST'])
+@app.route("/add_trigger", methods=["POST"])
 @login_required
 def add_trigger():
-    trigger = Trigger(
-        user_id=current_user.id,
-        date_time=datetime.strptime(request.form['date_time'], '%Y-%m-%dT%H:%M'),
-        type=request.form['type'],
-        notes=request.form['notes']
-    )
-    db.session.add(trigger)
-    db.session.commit()
-    return redirect(url_for('triggers_log'))
+    try:
+        # Get the trigger type (either from select or custom input)
+        trigger_type = request.form.get("type") or request.form.get("custom_type")
+        notes = request.form.get("notes")
+        datetime_str = request.form.get("date_time")
+        
+        trigger = Trigger(
+            type=trigger_type,
+            notes=notes,
+            time=datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M'),
+            user_id=current_user.id
+        )
+        
+        db.session.add(trigger)
+        db.session.commit()
+        
+        flash("Trigger logged successfully!")
+        return redirect(url_for("triggers_log"))
+    except Exception as e:
+        flash("Error logging trigger. Please try again.")
+        return redirect(url_for("triggers_log"))
 
 @app.route('/logout')
 @login_required

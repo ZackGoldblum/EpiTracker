@@ -26,7 +26,7 @@
     text-align: center;
     position: relative;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
 }
 
 .calendar-day:hover {
@@ -34,17 +34,19 @@
 }
 
 .calendar-day.has-event {
-    background-color: rgba(74, 144, 226, 0.1);
+    background-color: transparent;
 }
 
 .calendar-day.today {
-    border-color: var(--primary-color);
+    border: 1px solid var(--primary-color);
     font-weight: bold;
+    color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color);
 }
 
 .event-dot {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     position: absolute;
     bottom: 4px;
@@ -54,12 +56,15 @@
 
 .event-dot.medication {
     background-color: var(--primary-color);
+    box-shadow: 0 0 0 1px rgba(74, 144, 226, 0.3);
 }
 
 .event-dot.seizure {
     background-color: var(--error-color);
+    box-shadow: 0 0 0 1px rgba(244, 67, 54, 0.3);
 }
 
 .event-dot.trigger {
     background-color: #ff9800;
+    box-shadow: 0 0 0 1px rgba(255, 152, 0, 0.3);
 }

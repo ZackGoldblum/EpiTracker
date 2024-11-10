@@ -31,19 +31,21 @@ body {
 nav {
     background-color: white;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 1rem 0;
+    padding: 0.5rem 0;
     position: sticky;
     top: 0;
     z-index: 1000;
+    margin-bottom: 1rem;
 }
 
 .nav-content {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 2rem;
+    padding: 1rem 2rem;
+    width: 100%;
 }
 
 nav h1 {
@@ -84,9 +86,9 @@ nav a.active {
 nav a[href*="logout"] {
     color: #e74c3c;
     border: 1px solid #e74c3c;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
     border-radius: 8px;
-    margin-left: 1rem;
+    margin-left: 0;
 }
 
 nav a[href*="logout"]:hover {
@@ -101,9 +103,13 @@ main {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 2rem;
+    padding-top: 1rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Cards */
@@ -113,8 +119,7 @@ main {
     padding: 1.5rem;
     box-shadow: var(--card-shadow);
     transition: all 0.3s ease;
-    margin-bottom: 1.5rem;
-    color: var(--text-color);
+    height: 100%;
 }
 
 .card:hover {
@@ -132,10 +137,9 @@ main {
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
-    margin-top: 2rem;
-    padding: 0 2rem;
+    width: 100%;
 }
 
 /* Forms */
@@ -184,14 +188,21 @@ button[type="submit"]:hover {
 
 /* Buttons */
 .btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     background-color: var(--primary-color);
     color: white;
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 1rem;
     border: none;
-    border-radius: 8px;
-    font-weight: 500;
+    border-radius: 4px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
 }
 
 .btn-secondary {
@@ -203,6 +214,7 @@ button[type="submit"]:hover {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+    text-decoration: none;
 }
 
 .btn-secondary:hover {
@@ -434,12 +446,11 @@ footer * {
 h2 {
     color: var(--text-color);
     font-size: 2rem;
-    margin: 2rem 0;
-    padding: 0 2rem;
+    margin: 0 0 1rem 0;
 }
 
 .daily-log-section {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--border-color);
 }
@@ -470,21 +481,21 @@ h2 {
 
 /* Log Pages Common Styles */
 .log-container {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 2rem;
+    padding-top: 1rem;
+    width: 100%;
 }
 
 .header-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .header-section h2 {
-    font-size: 2rem;
-    color: var(--text-color);
     margin: 0;
 }
 
@@ -495,21 +506,22 @@ h2 {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
     margin-bottom: 2rem;
+    width: 100%;
 }
 
 /* Log List Styles */
 .log-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
+    grid-template-columns: 1fr;
+    gap: 1rem;
 }
 
 .log-item {
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
     padding: 1.5rem;
+    margin-bottom: 0rem;
+    border: 1px solid var(--border-color);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -518,121 +530,27 @@ h2 {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Medication specific styles */
-.medication-item {
+.log-date {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
+.log-details {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.detail-row {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.med-info h3 {
-    color: var(--primary-color);
-    margin: 0 0 0.5rem 0;
-    font-size: 1.2rem;
-}
-
-.med-info p {
-    margin: 0.25rem 0;
-    color: var(--text-color);
-}
-
-.med-actions {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-}
-
-/* Custom checkbox styling */
-.med-checkbox {
-    width: 24px;
-    height: 24px;
-    position: relative;
-    cursor: pointer;
-}
-
-.med-checkbox input {
-    opacity: 0;
-    position: absolute;
-}
-
-.checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 24px;
-    width: 24px;
-    background-color: #fff;
-    border: 2px solid var(--primary-color);
-    border-radius: 6px;
-    transition: all 0.2s;
-}
-
-.med-checkbox input:checked ~ .checkmark {
-    background-color: var(--primary-color);
-}
-
-.checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-}
-
-.med-checkbox input:checked ~ .checkmark:after {
-    display: block;
-    left: 8px;
-    top: 4px;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-}
-
-/* Button Styles */
-.btn-primary {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    border: none;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.btn-primary:hover {
-    background-color: var(--primary-dark);
-    transform: translateY(-1px);
-}
-
-/* Status indicators */
-.status-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-.status-taken {
-    background-color: var(--success-color);
-    color: white;
-}
-
-.status-pending {
-    background-color: #ffd700;
-    color: #333;
-}
-
-.auth-card + .alert {
-    margin-top: 1rem;
+.detail-label {
+    font-weight: 600;
+    color: var(--text-color);
+    min-width: 100px;
 }
 
 /* Auth title styles */
@@ -699,4 +617,396 @@ h2 {
     max-width: 400px;
     height: 60px;
     position: relative;
+}
+
+/* Mobile menu button */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: block;
+    }
+
+    .nav-content {
+        padding: 0 1rem;
+    }
+
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-links.show {
+        display: flex;
+    }
+
+    .nav-links li {
+        width: 100%;
+    }
+
+    .nav-links a {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        display: block;
+    }
+
+    /* Dashboard grid */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    /* Calendar adjustments */
+    .calendar {
+        font-size: 0.875rem;
+        padding: 0.5rem;
+    }
+
+    /* Form adjustments */
+    .auth-card,
+    .modal-content {
+        width: 90%;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+
+    /* Auth title */
+    .auth-title {
+        font-size: 2rem;
+        padding: 0 1rem;
+    }
+
+    .auth-title span {
+        font-size: 1rem;
+    }
+
+    /* Container padding */
+    .container,
+    .log-container {
+        padding: 1rem;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .nav-content h1 {
+        font-size: 1.25rem;
+    }
+
+    .auth-title {
+        font-size: 1.75rem;
+    }
+}
+
+/* Container for individual log pages */
+.log-page-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Log list container */
+.log-list-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+/* Consistent form styling */
+.log-form {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Modal consistency */
+.modal-content {
+    max-width: 600px;
+    width: 90%;
+}
+
+/* SVG styles within buttons */
+.btn-primary svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end; /* Aligns items to the right */
+    margin-top: 1rem; /* Adds some space above the buttons */
+}
+
+.modal-actions .btn-secondary {
+    margin-left: 1rem; /* Adds space between the buttons */
+}
+
+.selected-day-logs h3 {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.no-logs {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+/* Add these styles after the existing .log-list styles */
+.log-date-section {
+    margin: 1rem 0 0rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.log-date-section h3 {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.log-item {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 0rem;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.log-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.log-item-details {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.log-item-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.log-item-label {
+    font-weight: 600;
+    color: var(--text-color);
+    min-width: 100px;
+}
+
+.log-time {
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    padding: 4px 8px;
+    background-color: #dee1f3;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.daily-log-section {
+    margin-top: 1rem;
+}
+
+.daily-log-section h4 {
+    color: var(--text-color);
+}
+
+.log-time-display {
+    font-weight: 500;
+    color: var(--text-muted);
+    font-size: 0.9em;
+    margin-bottom: 4px;
+    padding: 2px 6px;
+    background-color: #dee1f3;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.daily-log-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.log-content {
+    margin-top: 4px;
+}
+
+.daily-log-item:last-child {
+    border-bottom: none;
+}
+
+.dosage-input-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.dosage-value {
+    width: 100px !important;
+}
+
+.dosage-unit {
+    width: 100px !important;
+}
+
+#med-name {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: white;
+}
+
+#custom-med-name {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+#seizure-type {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: white;
+}
+
+#custom-seizure-type {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.duration-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.duration-number-input {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+}
+
+.duration-number-input input {
+    width: 60px;
+    border: none;
+    padding: 0.25rem;
+    -moz-appearance: textfield; /* Firefox */
+}
+
+.duration-number-input input::-webkit-outer-spin-button,
+.duration-number-input input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.duration-unit {
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.duration-quick-select {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.duration-btn {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.duration-btn:hover {
+    background: var(--secondary-color);
+    border-color: var(--primary-color);
+}
+
+.duration-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.trigger-notes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.quick-notes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.quick-note-btn {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.quick-note-btn:hover {
+    background: var(--secondary-color);
+    border-color: var(--primary-color);
+}
+
+.quick-note-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+#trigger-notes {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 80px;
 }

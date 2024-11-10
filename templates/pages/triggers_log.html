@@ -18,26 +18,8 @@
         <div class="calendar" id="trigger-calendar"></div>
     </div>
 
-    <div class="log-list">
-        {% for trigger in triggers %}
-        <div class="log-item trigger-item">
-            <div class="log-date">{{ trigger.date_time.strftime('%B %d, %Y - %I:%M %p') }}</div>
-            <div class="log-details">
-                <div class="detail-row">
-                    <span class="detail-label">Type:</span>
-                    <span class="trigger-badge trigger-{{ trigger.type.lower().replace(' ', '-') }}">
-                        {{ trigger.type }}
-                    </span>
-                </div>
-                {% if trigger.notes %}
-                <div class="detail-row">
-                    <span class="detail-label">Notes:</span>
-                    <p class="trigger-notes">{{ trigger.notes }}</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
+    <div id="selected-day-logs" class="log-list">
+        <p class="no-logs">Select a day in the calendar to view logs.</p>
     </div>
 </div>
 
@@ -52,24 +34,51 @@
             </div>
             <div class="form-group">
                 <label for="trigger-type">Type</label>
-                <select id="trigger-type" name="type" required>
+                <select id="trigger-type" name="type" required onchange="handleTriggerSelect(this)">
+                    <option value="">Select Trigger</option>
                     <option value="Stress">Stress</option>
                     <option value="Lack of Sleep">Lack of Sleep</option>
                     <option value="Missed Medication">Missed Medication</option>
                     <option value="Alcohol">Alcohol</option>
                     <option value="Flashing Lights">Flashing Lights</option>
-                    <option value="Other">Other</option>
+                    <option value="Illness/Fever">Illness/Fever</option>
+                    <option value="Menstruation">Menstruation</option>
+                    <option value="Dehydration">Dehydration</option>
+                    <option value="Exercise">Exercise</option>
+                    <option value="Anxiety">Anxiety</option>
+                    <option value="custom">+ Add Custom Trigger</option>
                 </select>
+                <input type="text" 
+                       id="custom-trigger-type" 
+                       name="custom_type" 
+                       placeholder="Enter trigger type"
+                       style="display: none; margin-top: 0.5rem;">
             </div>
             <div class="form-group">
                 <label for="trigger-notes">Notes</label>
-                <textarea id="trigger-notes" name="notes" rows="3"></textarea>
+                <div class="trigger-notes-container">
+                    <textarea id="trigger-notes" name="notes" rows="3" placeholder="Add any additional details..."></textarea>
+                    <div class="quick-notes" id="quick-notes">
+                        <!-- Quick note suggestions will be added based on trigger type -->
+                    </div>
+                </div>
             </div>
             <div class="modal-actions">
                 <button type="submit" class="btn-primary">Log Trigger</button>
-                <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                <button type="button" class="btn-secondary cancel-button" onclick="closeModal()">Cancel</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Daily Logs Modal -->
+<div id="dailyLogsModal" class="modal">
+    <div class="modal-content">
+        <h3>Logs for <span id="selectedDate"></span></h3>
+        <div id="dailyLogs">
+            <div id="triggerLogs"></div>
+        </div>
+        <button type="button" class="btn-secondary" onclick="closeModal()">Close</button>
     </div>
 </div>
 {% endblock %}

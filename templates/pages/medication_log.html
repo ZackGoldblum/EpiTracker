@@ -18,52 +18,64 @@
         <div class="calendar" id="medication-calendar"></div>
     </div>
 
-    <div class="medication-list">
-        {% for med in medications %}
-        <div class="medication-item">
-            <div class="med-info">
-                <h3>{{ med.name }}</h3>
-                <p>Dosage: {{ med.dosage }}</p>
-                <p>Time: {{ med.time.strftime('%I:%M %p') }}</p>
-            </div>
-            <div class="med-actions">
-                <span class="status-badge {{ 'status-taken' if med.taken else 'status-pending' }}">
-                    {{ 'Taken' if med.taken else 'Pending' }}
-                </span>
-                <label class="med-checkbox">
-                    <input type="checkbox" 
-                           {% if med.taken %}checked{% endif %}
-                           onchange="updateMedicationStatus('{{ med.id }}', this)">
-                    <span class="checkmark"></span>
-                </label>
-            </div>
-        </div>
-        {% endfor %}
+    <div id="selected-day-logs" class="log-list">
+        <p class="no-logs">Select a day in the calendar to view logs.</p>
     </div>
 </div>
 
 <!-- Add Medication Modal -->
 <div id="addMedicationModal" class="modal">
     <div class="modal-content">
-        <h3>Add New Medication</h3>
+        <h3>Add Medication</h3>
         <form method="POST" action="{{ url_for('add_medication') }}">
-            <div class="form-group">
-                <label for="med-name">Medication Name</label>
-                <input type="text" id="med-name" name="name" required>
-            </div>
-            <div class="form-group">
-                <label for="med-dosage">Dosage</label>
-                <input type="text" id="med-dosage" name="dosage" required>
-            </div>
             <div class="form-group">
                 <label for="med-datetime">Date & Time</label>
                 <input type="datetime-local" id="med-datetime" name="datetime" required>
             </div>
+            <div class="form-group">
+                <label for="med-name">Medication Name</label>
+                <select id="med-name" name="name" required onchange="handleMedicationSelect(this)">
+                    <option value="">Select medication</option>
+                    <option value="Levetiracetam">Levetiracetam (Keppra)</option>
+                    <option value="Lamotrigine">Lamotrigine (Lamictal)</option>
+                    <option value="Carbamazepine">Carbamazepine (Tegretol)</option>
+                    <option value="Valproate">Valproate (Depakote)</option>
+                    <option value="Oxcarbazepine">Oxcarbazepine (Trileptal)</option>
+                    <option value="custom">+ Add Custom Medication</option>
+                </select>
+                <input type="text" id="custom-med-name" name="custom_name" 
+                       placeholder="Enter medication name" 
+                       style="display: none; margin-top: 0.5rem;">
+            </div>
+            <div class="form-group">
+                <label for="med-dosage">Dosage</label>
+                <div class="dosage-input-group">
+                    <input type="number" id="med-dosage-value" name="dosage_value" 
+                           required min="0" step="any" class="dosage-value" value="1">
+                    <select id="med-dosage-unit" name="dosage_unit" required class="dosage-unit">
+                        <option value="mg">mg</option>
+                        <option value="g">g</option>
+                        <option value="ml">ml</option>
+                        <option value="tablet">tablet(s)</option>
+                    </select>
+                </div>
+            </div>
             <div class="modal-actions">
                 <button type="submit" class="btn-primary">Add Medication</button>
-                <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                <button type="button" class="btn-secondary cancel-button" onclick="closeModal()">Cancel</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Daily Logs Modal -->
+<div id="dailyLogsModal" class="modal">
+    <div class="modal-content">
+        <h3>Logs for <span id="selectedDate"></span></h3>
+        <div id="dailyLogs">
+            <div id="medicationLogs"></div>
+        </div>
+        <button type="button" class="btn-secondary" onclick="closeModal()">Close</button>
     </div>
 </div>
 {% endblock %}

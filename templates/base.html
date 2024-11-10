@@ -9,15 +9,22 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
     <script src="{{ url_for('static', filename='js/calendar.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/alerts.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/mobile_nav.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/form-utils.js') }}" defer></script>
 </head>
 <body>
     {% if request.endpoint not in ['login', 'register'] %}
     <nav>
         <div class="nav-content">
-            <a href="{{ url_for('dashboard') }}">
+            <a href="{{ url_for('dashboard') }}" class="nav-logo">
                 <h1>Epilepsy Management</h1>
             </a>
-            <ul>
+            <button class="mobile-menu-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M3 12h18M3 6h18M3 18h18" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <ul class="nav-links">
                 <li><a href="{{ url_for('dashboard') }}" {% if request.endpoint == 'dashboard' %}class="active"{% endif %}>Dashboard</a></li>
                 <li><a href="{{ url_for('medication_log') }}" {% if request.endpoint == 'medication_log' %}class="active"{% endif %}>Medications</a></li>
                 <li><a href="{{ url_for('seizure_log') }}" {% if request.endpoint == 'seizure_log' %}class="active"{% endif %}>Seizures</a></li>
