@@ -26,7 +26,7 @@ def generate_insights(start_date, end_date, medications, seizures, triggers):
     """
     # Construct the prompt
     prompt = (
-        f"Analyze the following epilepsy management data for a patient from {start_date} to {end_date}.\n\n"
+        f"Here is the data from {start_date} to {end_date}.\n\n"
         f"Medications:\n"
     )
     for med in medications:
@@ -39,10 +39,6 @@ def generate_insights(start_date, end_date, medications, seizures, triggers):
     prompt += "\nTriggers:\n"
     for trig in triggers:
         prompt += f"- {trig['type']} on {trig['timestamp']}. Notes: {trig.get('notes', 'N/A')}\n"
-
-    prompt += "\nProvide an analysis of the patient's condition based on the above data and suggest recommendations for improvement."
-
-    print(prompt)
 
     # Define the messages for ChatCompletion
     messages = [
