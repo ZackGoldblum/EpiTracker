@@ -29,6 +29,7 @@
                 <li><a href="{{ url_for('medication_log') }}" {% if request.endpoint == 'medication_log' %}class="active"{% endif %}>Medications</a></li>
                 <li><a href="{{ url_for('seizure_log') }}" {% if request.endpoint == 'seizure_log' %}class="active"{% endif %}>Seizures</a></li>
                 <li><a href="{{ url_for('triggers_log') }}" {% if request.endpoint == 'triggers_log' %}class="active"{% endif %}>Triggers</a></li>
+                <li><a href="{{ url_for('insights') }}" {% if request.endpoint == 'insights' %}class="active"{% endif %}>Insights</a></li>
                 <li><a href="{{ url_for('logout') }}">Logout</a></li>
             </ul>
         </div>

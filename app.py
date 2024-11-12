@@ -9,6 +9,7 @@ from flask_login import (
 )
 from models.database import db, User, Medication, Seizure, Trigger
 from werkzeug.security import generate_password_hash, check_password_hash
+from openai_service import generate_insights
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "your-secret-key"  # Change this in production
@@ -249,6 +250,70 @@ def get_daily_logs(date):
         })
     except ValueError:
         return jsonify({'error': 'Invalid date format'}), 400
+
+@app.route("/insights")
+@login_required
+def insights():
+    return render_template("pages/insights.html")
+
+@app.route("/api/insights", methods=["POST"])
+@login_required
+def get_insights():
+    data = request.get_json()
+    start_date = datetime.strptime(data['start_date'], '%Y-%m-%d')
+    end_date = datetime.strptime(data['end_date'], '%Y-%m-%d') + timedelta(days=1)
+
+    # Fetch data for the specified date range
+    medications = Medication.query.filter(
+        Medication.user_id == current_user.id,
+        Medication.timestamp >= start_date,
+        Medication.timestamp < end_date
+    ).all()
+
+    seizures = Seizure.query.filter(
+        Seizure.user_id == current_user.id,
+        Seizure.timestamp >= start_date,
+        Seizure.timestamp < end_date
+    ).all()
+
+    triggers = Trigger.query.filter(
+        Trigger.user_id == current_user.id,
+        Trigger.timestamp >= start_date,
+        Trigger.timestamp < end_date
+    ).all()
+
+    # Format data for analysis
+    formatted_medications = [{
+        'name': med.name,
+        'dosage': med.dosage,
+        'timestamp': med.timestamp.strftime('%Y-%m-%d %H:%M'),
+        'taken': med.taken
+    } for med in medications]
+
+    formatted_seizures = [{
+        'type': seiz.type,
+        'severity': seiz.severity,
+        'duration': seiz.duration,
+        'timestamp': seiz.timestamp.strftime('%Y-%m-%d %H:%M')
+    } for seiz in seizures]
+
+    formatted_triggers = [{
+        'type': trig.type,
+        'notes': trig.notes,
+        'timestamp': trig.timestamp.strftime('%Y-%m-%d %H:%M')
+    } for trig in triggers]
+
+    try:
+        analysis = generate_insights(
+            data['start_date'],
+            data['end_date'],
+            formatted_medications,
+            formatted_seizures,
+            formatted_triggers
+        )
+        return jsonify({'success': True, 'analysis': analysis})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 if __name__ == "__main__":
