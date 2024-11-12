@@ -927,7 +927,6 @@ h2 {
     width: 60px;
     border: none;
     padding: 0.25rem;
-    -moz-appearance: textfield; /* Firefox */
 }
 
 .duration-number-input input::-webkit-outer-spin-button,
