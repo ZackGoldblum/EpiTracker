@@ -4,6 +4,8 @@ import argparse
 
 def init_db(with_demo_data=False):
     with app.app_context():
+        # Drop all tables to wipe the database
+        db.drop_all()
         # Create all tables
         db.create_all()
         print("Database initialized successfully!")
