@@ -79,7 +79,7 @@ def get_events(event_type):
     
     return jsonify([{
         'id': e.id,
-        'date': e.time.isoformat() if hasattr(e, 'time') else e.date_time.isoformat(),
+        'date': e.timestamp.isoformat() if hasattr(e, 'timestamp') else e.timestamp.isoformat(),
         'type': event_type
     } for e in events])
 
@@ -101,7 +101,7 @@ def add_medication():
         medication = Medication(
             name=name,
             dosage=dosage,
-            time=medication_datetime,
+            timestamp=medication_datetime,
             user_id=current_user.id
         )
         
@@ -123,7 +123,7 @@ def add_seizure():
         
         seizure = Seizure(
             user_id=current_user.id,
-            date_time=datetime.strptime(request.form['date_time'], '%Y-%m-%dT%H:%M'),
+            timestamp=datetime.strptime(request.form['timestamp'], '%Y-%m-%dT%H:%M'),
             type=seizure_type,
             severity=int(request.form['severity']),
             duration=int(request.form['duration'])
@@ -144,12 +144,12 @@ def add_trigger():
         # Get the trigger type (either from select or custom input)
         trigger_type = request.form.get("type") or request.form.get("custom_type")
         notes = request.form.get("notes")
-        datetime_str = request.form.get("date_time")
+        datetime_str = request.form.get("timestamp")
         
         trigger = Trigger(
             type=trigger_type,
             notes=notes,
-            time=datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M'),
+            timestamp=datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M'),
             user_id=current_user.id
         )
         
@@ -210,20 +210,20 @@ def get_daily_logs(date):
         
         medications = Medication.query.filter(
             Medication.user_id == current_user.id,
-            Medication.time >= date_obj,
-            Medication.time < next_day
+            Medication.timestamp >= date_obj,
+            Medication.timestamp < next_day
         ).all()
         
         seizures = Seizure.query.filter(
             Seizure.user_id == current_user.id,
-            Seizure.date_time >= date_obj,
-            Seizure.date_time < next_day
+            Seizure.timestamp >= date_obj,
+            Seizure.timestamp < next_day
         ).all()
         
         triggers = Trigger.query.filter(
             Trigger.user_id == current_user.id,
-            Trigger.date_time >= date_obj,
-            Trigger.date_time < next_day
+            Trigger.timestamp >= date_obj,
+            Trigger.timestamp < next_day
         ).all()
         
         return jsonify({
@@ -231,20 +231,20 @@ def get_daily_logs(date):
                 'id': med.id,
                 'name': med.name,
                 'dosage': med.dosage,
-                'time': med.time.isoformat()
+                'timestamp': med.timestamp.isoformat()
             } for med in medications],
             'seizures': [{
                 'id': seizure.id,
                 'type': seizure.type,
                 'severity': seizure.severity,
                 'duration': seizure.duration,
-                'date_time': seizure.date_time.isoformat()
+                'timestamp': seizure.timestamp.isoformat()
             } for seizure in seizures],
             'triggers': [{
                 'id': trigger.id,
                 'type': trigger.type,
                 'notes': trigger.notes,
-                'date_time': trigger.date_time.isoformat()
+                'timestamp': trigger.timestamp.isoformat()
             } for trigger in triggers]
         })
     except ValueError:

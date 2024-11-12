@@ -25,7 +25,7 @@ def generate_medication_schedule(user_id, start_date, end_date):
             medications.append(Medication(
                 name="Levetiracetam",
                 dosage="500 mg",
-                time=morning_time,
+                timestamp=morning_time,
                 taken=True,
                 user_id=user_id
             ))
@@ -37,7 +37,7 @@ def generate_medication_schedule(user_id, start_date, end_date):
             medications.append(Medication(
                 name="Levetiracetam",
                 dosage="500 mg",
-                time=evening_time,
+                timestamp=evening_time,
                 taken=True,
                 user_id=user_id
             ))
@@ -51,11 +51,11 @@ def generate_seizure_events(user_id, start_date, end_date, missed_meds):
     # Generate seizures with higher probability on days with missed medications
     for missed_med in missed_meds:
         if random.random() < 0.7:  # Chance of seizure after missed medication
-            seizure_time = missed_med.time + timedelta(hours=random.randint(2, 8))
+            seizure_time = missed_med.timestamp + timedelta(hours=random.randint(2, 8))
             if start_date <= seizure_time <= end_date:
                 seizures.append(Seizure(
                     user_id=user_id,
-                    date_time=seizure_time,
+                    timestamp=seizure_time,
                     type=random.choice(["Tonic-Clonic", "Focal", "Absence"]),
                     severity=random.randint(3, 8),
                     duration=random.randint(1, 5)
@@ -71,7 +71,7 @@ def generate_seizure_events(user_id, start_date, end_date, missed_meds):
             )
             seizures.append(Seizure(
                 user_id=user_id,
-                date_time=seizure_time,
+                timestamp=seizure_time,
                 type=random.choice(["Tonic-Clonic", "Focal", "Absence"]),
                 severity=random.randint(3, 8),
                 duration=random.randint(1, 5)
@@ -92,7 +92,7 @@ def generate_triggers(user_id, seizures, start_date, end_date):
     # Add triggers correlated with seizures
     for seizure in seizures:
         if random.random() < 0.85:  # Chance of identified trigger before seizure
-            trigger_time = seizure.date_time - timedelta(hours=random.randint(1, 4))
+            trigger_time = seizure.timestamp - timedelta(hours=random.randint(1, 4))
             trigger_type = random.choice(trigger_types)
             
             notes = ""
@@ -107,7 +107,7 @@ def generate_triggers(user_id, seizures, start_date, end_date):
             triggers.append(Trigger(
                 user_id=user_id,
                 type=trigger_type,
-                date_time=trigger_time,
+                timestamp=trigger_time,
                 notes=notes
             ))
     
@@ -122,7 +122,7 @@ def generate_triggers(user_id, seizures, start_date, end_date):
             triggers.append(Trigger(
                 user_id=user_id,
                 type=random.choice(trigger_types),
-                date_time=trigger_time,
+                timestamp=trigger_time,
                 notes="Potential trigger - no seizure occurred"
             ))
         current_date += timedelta(days=1)
