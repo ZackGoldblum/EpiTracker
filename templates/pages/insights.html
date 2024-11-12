@@ -33,7 +33,7 @@
 
     <div id="analysis-result" class="analysis-card" style="display: none;">
         <h3>Analysis Results</h3>
-        <div id="analysis-content"></div>
+        <div id="analysis-content" class="markdown-content"></div>
     </div>
 </div>
 
@@ -46,6 +46,16 @@ function setDateRange(days) {
     document.getElementById('end-date').value = end.toISOString().split('T')[0];
     document.getElementById('start-date').value = start.toISOString().split('T')[0];
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if there's saved analysis in localStorage
+    const savedAnalysis = localStorage.getItem('analysisContent');
+    if (savedAnalysis) {
+        const analysisContent = document.getElementById('analysis-content');
+        analysisContent.innerHTML = savedAnalysis;
+        document.getElementById('analysis-result').style.display = 'block';
+    }
+});
 
 document.getElementById('insights-form').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -86,7 +96,8 @@ document.getElementById('insights-form').addEventListener('submit', async functi
         
         if (data.success) {
             const analysisContent = document.getElementById('analysis-content');
-            analysisContent.innerHTML = data.analysis.replace(/\n/g, '<br>');
+            analysisContent.innerHTML = data.analysis;
+            localStorage.setItem('analysisContent', data.analysis); // Save analysis to localStorage
             document.getElementById('analysis-result').style.display = 'block';
         } else {
             alert('Error generating insights: ' + data.error);

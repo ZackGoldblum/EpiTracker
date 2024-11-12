@@ -10,6 +10,8 @@ from flask_login import (
 from models.database import db, User, Medication, Seizure, Trigger
 from werkzeug.security import generate_password_hash, check_password_hash
 from openai_service import generate_insights
+from markdown2 import Markdown
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "your-secret-key"  # Change this in production
@@ -311,7 +313,21 @@ def get_insights():
             formatted_seizures,
             formatted_triggers
         )
-        return jsonify({'success': True, 'analysis': analysis})
+        # Convert markdown to HTML without automatic line breaks
+        markdowner = Markdown(extras=["break-on-newline"])
+        analysis_html = markdowner.convert(analysis)
+
+        # Use BeautifulSoup to parse and clean up the HTML
+        soup = BeautifulSoup(analysis_html, 'html.parser')
+
+        # Remove all <br> tags from the analysis-content section
+        for br in soup.find_all('br'):
+            br.decompose()  # Remove the <br> tag
+
+        # Ensure the content is wrapped in a div with markdown-content class
+        cleaned_html = f'<div class="markdown-content">{str(soup)}</div>'
+
+        return jsonify({'success': True, 'analysis': cleaned_html})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
