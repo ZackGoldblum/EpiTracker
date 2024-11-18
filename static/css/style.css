@@ -1013,6 +1013,7 @@ h2 {
 /* Insights Page Styles */
 .insights-container {
     max-width: 800px;
+    width: 100%;
     margin: 2rem auto;
     padding: 0 1rem;
 }
@@ -1141,4 +1142,55 @@ h2 {
     margin: 0 0 0em 0;
     padding-left: 1em;
     color: var(--text-muted);
+}
+
+.history-section {
+    margin-top: 2rem;
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+}
+
+.history-item {
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.5rem 0;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.history-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.history-item-date {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-left: 1rem;
+}
+
+.history-item-content {
+    display: none;
+    padding: 1.5rem;
+    padding-top: 0rem;
+    padding-bottom: 0rem;
+    background: var(--background-color);
+    border-radius: 8px;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+.history-item-range {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.history-item.expanded .history-item-content {
+    display: block;
 }

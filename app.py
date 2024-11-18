@@ -7,7 +7,7 @@ from flask_login import (
     logout_user,
     current_user,
 )
-from models.database import db, User, Medication, Seizure, Trigger
+from models.database import db, User, Medication, Seizure, Trigger, InsightHistory
 from werkzeug.security import generate_password_hash, check_password_hash
 from openai_service import generate_insights
 
@@ -313,10 +313,35 @@ def get_insights():
             formatted_triggers
         )
         
+        # Save to history
+        history_entry = InsightHistory(
+            user_id=current_user.id,
+            start_date=start_date,
+            end_date=end_date,
+            analysis=analysis
+        )
+        db.session.add(history_entry)
+        db.session.commit()
+        
         # Return raw markdown instead of HTML
         return jsonify({'success': True, 'analysis': analysis})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route("/api/insights/history")
+@login_required
+def get_insights_history():
+    history = InsightHistory.query.filter_by(user_id=current_user.id)\
+        .order_by(InsightHistory.generated_at.desc())\
+        .limit(10)\
+        .all()
+    
+    return jsonify([{
+        'start_date': h.start_date.strftime('%Y-%m-%d'),
+        'end_date': h.end_date.strftime('%Y-%m-%d'),
+        'analysis': h.analysis,
+        'generated_at': h.generated_at.isoformat()
+    } for h in history])
 
 
 if __name__ == "__main__":

@@ -35,88 +35,120 @@
         <h3>Analysis Results</h3>
         <div id="analysis-content" class="markdown-content"></div>
     </div>
+
+    <div id="insights-history" class="history-section">
+        <h3>Previous Insights</h3>
+        <div id="history-list"></div>
+    </div>
 </div>
 
 <script>
-function setDateRange(days) {
-    const end = new Date();
-    const start = new Date();
-    start.setDate(end.getDate() - days);
-    
-    document.getElementById('end-date').value = end.toISOString().split('T')[0];
-    document.getElementById('start-date').value = start.toISOString().split('T')[0];
-}
+    function setDateRange(days) {
+        const end = new Date();
+        const start = new Date();
+        start.setDate(end.getDate() - days);
 
-// Configure marked.js options
-marked.setOptions({
-    breaks: true,  // Convert line breaks to <br>
-    gfm: true,     // Enable GitHub Flavored Markdown
-    sanitize: true // Sanitize HTML tags for security
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if there's saved analysis in localStorage
-    const savedAnalysis = localStorage.getItem('analysisContent');
-    if (savedAnalysis) {
-        const analysisContent = document.getElementById('analysis-content');
-        analysisContent.innerHTML = marked.parse(savedAnalysis);
-        document.getElementById('analysis-result').style.display = 'block';
-    }
-});
-
-document.getElementById('insights-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const startDate = document.getElementById('start-date').value;
-    const endDate = document.getElementById('end-date').value;
-    
-    if (!startDate || !endDate) {
-        alert('Please select both start and end dates');
-        return;
-    }
-    
-    if (new Date(startDate) > new Date(endDate)) {
-        alert('Start date cannot be after end date');
-        return;
+        document.getElementById('end-date').value = end.toISOString().split('T')[0];
+        document.getElementById('start-date').value = start.toISOString().split('T')[0];
     }
 
-    // Show loading spinner
-    document.getElementById('loading').style.display = 'flex';
-    document.getElementById('analysis-result').style.display = 'none';
+    // Configure marked.js options
+    marked.setOptions({
+        breaks: true,  // Convert line breaks to <br>
+        gfm: true,     // Enable GitHub Flavored Markdown
+        sanitize: true // Sanitize HTML tags for security
+    });
 
-    try {
-        const response = await fetch('/api/insights', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                start_date: startDate,
-                end_date: endDate
-            })
-        });
+    document.getElementById('insights-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
 
-        const data = await response.json();
-        
-        // Hide loading spinner
-        document.getElementById('loading').style.display = 'none';
-        
-        if (data.success) {
-            const analysisContent = document.getElementById('analysis-content');
-            // Use marked.js to parse markdown
-            analysisContent.innerHTML = marked.parse(data.analysis);
-            localStorage.setItem('analysisContent', data.analysis);
-            document.getElementById('analysis-result').style.display = 'block';
-        } else {
-            alert('Error generating insights: ' + data.error);
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates');
+            return;
         }
-    } catch (error) {
-        document.getElementById('loading').style.display = 'none';
-        alert('Error connecting to server');
-    }
-});
 
-// Set default date range to last 30 days
-setDateRange(30);
+        if (new Date(startDate) > new Date(endDate)) {
+            alert('Start date cannot be after end date');
+            return;
+        }
+
+        // Show loading spinner
+        document.getElementById('loading').style.display = 'flex';
+        document.getElementById('analysis-result').style.display = 'none';
+
+        try {
+            const response = await fetch('/api/insights', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    start_date: startDate,
+                    end_date: endDate
+                })
+            });
+
+            const data = await response.json();
+
+            document.getElementById('loading').style.display = 'none';
+
+            if (data.success) {
+                // Update latest analysis
+                const analysisContent = document.getElementById('analysis-content');
+                analysisContent.innerHTML = marked.parse(data.analysis);
+                document.getElementById('analysis-result').style.display = 'block';
+
+                // Update history
+                await loadInsightsHistory();
+            } else {
+                alert('Error generating insights: ' + data.error);
+            }
+        } catch (error) {
+            document.getElementById('loading').style.display = 'none';
+            alert('Error connecting to server');
+        }
+    });
+
+    async function loadInsightsHistory() {
+        try {
+            const response = await fetch('/api/insights/history');
+            const history = await response.json();
+
+
+            const historyList = document.getElementById('history-list');
+            historyList.innerHTML = history.map(item => {
+                // Format dates to DD/MM/YYYY
+                const startDate = new Date(item.start_date).toLocaleDateString();
+                const endDate = new Date(item.end_date).toLocaleDateString();
+                const generatedDate = new Date(item.generated_at).toLocaleDateString();
+                return `
+            <div class="history-item" onclick="toggleHistoryItem(this)">
+                <div class="history-item-header">
+                    <span class="history-item-range">Analysis for ${startDate} to ${endDate}</span>
+                    <span class="history-item-date">Generated on ${generatedDate}</span>
+                </div>
+                <div class="history-item-content markdown-content">
+                    ${marked.parse(item.analysis)}
+                </div>
+            </div>
+        `;
+            }).join('');
+        } catch (error) {
+            console.error('Error loading insights history:', error);
+        }
+    }
+
+    function toggleHistoryItem(element) {
+        element.classList.toggle('expanded');
+    }
+
+    // Load history when page loads
+    document.addEventListener('DOMContentLoaded', loadInsightsHistory);
+
+    // Set default date range to last 30 days
+    setDateRange(30);
 </script>
 {% endblock %}
