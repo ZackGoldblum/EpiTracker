@@ -10,6 +10,7 @@ A web application designed to improve epilepsy management in ambulatory settings
 - **Seizure Logging**: Record seizure events with type, severity, and duration
 - **Trigger Management**: Track potential seizure triggers
 - **Calendar Integration**: Visual representation of all health events
+- **Insights**: Generate and view analyses of historic health data
 
 ## Design
 The UI/UX design specifications for this project can be found in our [Figma Design Document](https://www.figma.com/design/xQAEsSvGQf7qSOuBbyZCcJ/BE-5280-Project).
@@ -19,8 +20,8 @@ The UI/UX design specifications for this project can be found in our [Figma Desi
 BE-5280-Project/
 ├── static/                         # Static files (CSS, JS, images)
 │   ├── css/                        # CSS stylesheets
-│   │   ├── style.css               # Main stylesheet
-│   │   └── calendar.css            # Calendar-specific styles
+│   │   ├── calendar.css            # Calendar-specific styles
+│   │   └──  style.css               # Main stylesheet
 │   ├── js/                         # JavaScript files
 │   │   ├── alerts.js               # Alert system
 │   │   ├── calendar.js             # Calendar functionality
@@ -30,20 +31,24 @@ BE-5280-Project/
 ├── templates/                      # HTML templates
 │   ├── base.html                   # Base template with common layout
 │   └── pages/                      # Individual page templates
-│       ├── login.html
-│       ├── register.html
 │       ├── dashboard.html
+│       ├── insights.html
+│       ├── login.html
 │       ├── medication_log.html
+│       ├── register.html
 │       ├── seizure_log.html
 │       └── triggers_log.html
 ├── models/                         # Database models
 │   └── database.py                 # SQLAlchemy models
+├── .env                            # Environment variables
+├── .gitignore                      # Git ignore file
 ├── app.py                          # Main Flask application file
 ├── init_db.py                      # Database initialization script
-├── simulate_patient.py             # Script to seed the database with demo data
+├── openai_service.py               # Service for interacting with OpenAI API
+├── README.md                       # Project documentation
 ├── requirements.txt                # Python dependencies
-├── .gitignore                      # Git ignore file
-└── README.md                       # Project documentation
+├── simulate_patient.py             # Script to seed the database with demo data
+└── system_prompt.txt               # System prompt for OpenAI API
 ```
 
 ## Setup
@@ -89,7 +94,13 @@ To initialize the database with demo patient data:
 python init_db.py --demo
 ```
 
-### 5. Run the Web Application
+### 5. Create a `.env` file
+```bash
+MODEL="gpt-4o-mini"
+OPENAI_API_KEY="<YOUR-OPENAI-API-KEY>"
+```
+
+### 6. Run the Web Application
 ```bash
 # Start the Flask server
 python app.py
@@ -103,6 +114,7 @@ The web application will be available at `http://127.0.0.1:5000/`
 - **Frontend**: HTML, CSS, JavaScript
 - **Authentication**: Flask-Login
 - **UI Components**: Custom-built calendar and modal systems
+- **AI**: OpenAI API for generating insights from the data
 
 ## How to Contribute
 

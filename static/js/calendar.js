@@ -47,7 +47,7 @@ class Calendar {
                 const medLogsHtml = data.medications.length ? 
                     data.medications.map(med => `
                         <div class="daily-log-item">
-                            <div class="log-time-display">${formatTime(med.time)}</div>
+                            <div class="log-time-display">${formatTime(med.timestamp)}</div>
                             <div class="log-content">
                                 <strong>${med.name}</strong> - ${med.dosage}
                             </div>
@@ -58,7 +58,7 @@ class Calendar {
                 const seizureLogsHtml = data.seizures.length ?
                     data.seizures.map(seizure => `
                         <div class="daily-log-item">
-                            <div class="log-time-display">${formatTime(seizure.date_time)}</div>
+                            <div class="log-time-display">${formatTime(seizure.timestamp)}</div>
                             <div class="log-content">
                                 <div>Type: ${seizure.type}</div>
                                 <div>Severity: ${seizure.severity}/10</div>
@@ -71,7 +71,7 @@ class Calendar {
                 const triggerLogsHtml = data.triggers.length ?
                     data.triggers.map(trigger => `
                         <div class="daily-log-item">
-                            <div class="log-time-display">${formatTime(trigger.date_time)}</div>
+                            <div class="log-time-display">${formatTime(trigger.timestamp)}</div>
                             <div class="log-content">
                                 <div>Type: ${trigger.type}</div>
                                 <div>Notes: ${trigger.notes || 'No notes'}</div>
@@ -106,7 +106,7 @@ class Calendar {
                              </div>
                              ${data.medications.map(med => `
                                 <div class="log-item">
-                                    <div class="log-time">${formatTime(med.time)}</div>
+                                    <div class="log-time">${formatTime(med.timestamp)}</div>
                                     <div class="log-item-details">
                                         <div class="log-item-row">
                                             <span class="log-item-label">Medication:</span>
@@ -128,7 +128,7 @@ class Calendar {
                              </div>
                              ${data.seizures.map(seizure => `
                                 <div class="log-item">
-                                    <div class="log-time">${formatTime(seizure.date_time)}</div>
+                                    <div class="log-time">${formatTime(seizure.timestamp)}</div>
                                     <div class="log-item-details">
                                         <div class="log-item-row">
                                             <span class="log-item-label">Type:</span>
@@ -154,7 +154,7 @@ class Calendar {
                              </div>
                              ${data.triggers.map(trigger => `
                                 <div class="log-item">
-                                    <div class="log-time">${formatTime(trigger.date_time)}</div>
+                                    <div class="log-time">${formatTime(trigger.timestamp)}</div>
                                     <div class="log-item-details">
                                         <div class="log-item-row">
                                             <span class="log-item-label">Type:</span>
@@ -363,7 +363,7 @@ async function showDailyLogs(date) {
         const medLogsHtml = medications.length ? 
             medications.map(med => `
                 <div class="daily-log-item">
-                    <div>${formatTime(med.time)}</div>
+                    <div>${formatTime(med.timestamp)}</div>
                     <strong>${med.name}</strong> - ${med.dosage}
                 </div>
             `).join('') : '<p class="no-logs">No medications logged</p>';
@@ -372,7 +372,7 @@ async function showDailyLogs(date) {
         const seizureLogsHtml = seizures.length ?
             seizures.map(seizure => `
                 <div class="daily-log-item">
-                    <div>${formatTime(seizure.date_time)}</div>
+                    <div>${formatTime(seizure.timestamp)}</div>
                     <div>Type: ${seizure.type}</div>
                     <div>Severity: ${seizure.severity}/10</div>
                     <div>Duration: ${seizure.duration} minutes</div>
@@ -383,7 +383,7 @@ async function showDailyLogs(date) {
         const triggerLogsHtml = triggers.length ?
             triggers.map(trigger => `
                 <div class="daily-log-item">
-                    <div>${formatTime(trigger.date_time)}</div>
+                    <div>${formatTime(trigger.timestamp)}</div>
                     <div>Type: ${trigger.type}</div>
                     <div>Notes: ${trigger.notes || 'No notes'}</div>
                 </div>

@@ -7,8 +7,9 @@ from flask_login import (
     logout_user,
     current_user,
 )
-from models.database import db, User, Medication, Seizure, Trigger
+from models.database import db, User, Medication, Seizure, Trigger, InsightHistory
 from werkzeug.security import generate_password_hash, check_password_hash
+from openai_service import generate_insights
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "your-secret-key"  # Change this in production
@@ -79,7 +80,7 @@ def get_events(event_type):
     
     return jsonify([{
         'id': e.id,
-        'date': e.time.isoformat() if hasattr(e, 'time') else e.date_time.isoformat(),
+        'date': e.timestamp.isoformat() if hasattr(e, 'timestamp') else e.timestamp.isoformat(),
         'type': event_type
     } for e in events])
 
@@ -101,7 +102,7 @@ def add_medication():
         medication = Medication(
             name=name,
             dosage=dosage,
-            time=medication_datetime,
+            timestamp=medication_datetime,
             user_id=current_user.id
         )
         
@@ -123,7 +124,7 @@ def add_seizure():
         
         seizure = Seizure(
             user_id=current_user.id,
-            date_time=datetime.strptime(request.form['date_time'], '%Y-%m-%dT%H:%M'),
+            timestamp=datetime.strptime(request.form['timestamp'], '%Y-%m-%dT%H:%M'),
             type=seizure_type,
             severity=int(request.form['severity']),
             duration=int(request.form['duration'])
@@ -144,12 +145,12 @@ def add_trigger():
         # Get the trigger type (either from select or custom input)
         trigger_type = request.form.get("type") or request.form.get("custom_type")
         notes = request.form.get("notes")
-        datetime_str = request.form.get("date_time")
+        datetime_str = request.form.get("timestamp")
         
         trigger = Trigger(
             type=trigger_type,
             notes=notes,
-            time=datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M'),
+            timestamp=datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M'),
             user_id=current_user.id
         )
         
@@ -210,20 +211,20 @@ def get_daily_logs(date):
         
         medications = Medication.query.filter(
             Medication.user_id == current_user.id,
-            Medication.time >= date_obj,
-            Medication.time < next_day
+            Medication.timestamp >= date_obj,
+            Medication.timestamp < next_day
         ).all()
         
         seizures = Seizure.query.filter(
             Seizure.user_id == current_user.id,
-            Seizure.date_time >= date_obj,
-            Seizure.date_time < next_day
+            Seizure.timestamp >= date_obj,
+            Seizure.timestamp < next_day
         ).all()
         
         triggers = Trigger.query.filter(
             Trigger.user_id == current_user.id,
-            Trigger.date_time >= date_obj,
-            Trigger.date_time < next_day
+            Trigger.timestamp >= date_obj,
+            Trigger.timestamp < next_day
         ).all()
         
         return jsonify({
@@ -231,24 +232,116 @@ def get_daily_logs(date):
                 'id': med.id,
                 'name': med.name,
                 'dosage': med.dosage,
-                'time': med.time.isoformat()
+                'timestamp': med.timestamp.isoformat()
             } for med in medications],
             'seizures': [{
                 'id': seizure.id,
                 'type': seizure.type,
                 'severity': seizure.severity,
                 'duration': seizure.duration,
-                'date_time': seizure.date_time.isoformat()
+                'timestamp': seizure.timestamp.isoformat()
             } for seizure in seizures],
             'triggers': [{
                 'id': trigger.id,
                 'type': trigger.type,
                 'notes': trigger.notes,
-                'date_time': trigger.date_time.isoformat()
+                'timestamp': trigger.timestamp.isoformat()
             } for trigger in triggers]
         })
     except ValueError:
         return jsonify({'error': 'Invalid date format'}), 400
+
+@app.route("/insights")
+@login_required
+def insights():
+    return render_template("pages/insights.html")
+
+@app.route("/api/insights", methods=["POST"])
+@login_required
+def get_insights():
+    data = request.get_json()
+    start_date = datetime.strptime(data['start_date'], '%Y-%m-%d')
+    end_date = datetime.strptime(data['end_date'], '%Y-%m-%d') + timedelta(days=1)
+
+    # Fetch data for the specified date range
+    medications = Medication.query.filter(
+        Medication.user_id == current_user.id,
+        Medication.timestamp >= start_date,
+        Medication.timestamp < end_date
+    ).all()
+
+    seizures = Seizure.query.filter(
+        Seizure.user_id == current_user.id,
+        Seizure.timestamp >= start_date,
+        Seizure.timestamp < end_date
+    ).all()
+
+    triggers = Trigger.query.filter(
+        Trigger.user_id == current_user.id,
+        Trigger.timestamp >= start_date,
+        Trigger.timestamp < end_date
+    ).all()
+
+    # Format data for analysis
+    formatted_medications = [{
+        'name': med.name,
+        'dosage': med.dosage,
+        'timestamp': med.timestamp.strftime('%Y-%m-%d %H:%M'),
+        'taken': med.taken
+    } for med in medications]
+
+    formatted_seizures = [{
+        'type': seiz.type,
+        'severity': seiz.severity,
+        'duration': seiz.duration,
+        'timestamp': seiz.timestamp.strftime('%Y-%m-%d %H:%M')
+    } for seiz in seizures]
+
+    formatted_triggers = [{
+        'type': trig.type,
+        'notes': trig.notes,
+        'timestamp': trig.timestamp.strftime('%Y-%m-%d %H:%M')
+    } for trig in triggers]
+
+    try:
+        # Get raw markdown from OpenAI
+        analysis = generate_insights(
+            data['start_date'],
+            data['end_date'],
+            formatted_medications,
+            formatted_seizures,
+            formatted_triggers
+        )
+        
+        # Save to history
+        history_entry = InsightHistory(
+            user_id=current_user.id,
+            start_date=start_date,
+            end_date=end_date,
+            analysis=analysis
+        )
+        db.session.add(history_entry)
+        db.session.commit()
+        
+        # Return raw markdown instead of HTML
+        return jsonify({'success': True, 'analysis': analysis})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route("/api/insights/history")
+@login_required
+def get_insights_history():
+    history = InsightHistory.query.filter_by(user_id=current_user.id)\
+        .order_by(InsightHistory.generated_at.desc())\
+        .limit(10)\
+        .all()
+    
+    return jsonify([{
+        'start_date': h.start_date.strftime('%Y-%m-%d'),
+        'end_date': h.end_date.strftime('%Y-%m-%d'),
+        'analysis': h.analysis,
+        'generated_at': h.generated_at.isoformat()
+    } for h in history])
 
 
 if __name__ == "__main__":

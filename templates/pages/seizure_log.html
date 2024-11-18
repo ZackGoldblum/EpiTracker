@@ -30,7 +30,7 @@
         <form method="POST" action="{{ url_for('add_seizure') }}">
             <div class="form-group">
                 <label for="seizure-datetime">Date & Time</label>
-                <input type="datetime-local" id="seizure-datetime" name="date_time" required value="{{ current_time }}">
+                <input type="datetime-local" id="seizure-datetime" name="timestamp" required value="{{ current_time }}">
             </div>
             <div class="form-group">
                 <label for="seizure-type">Type</label>
