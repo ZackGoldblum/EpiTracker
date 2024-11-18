@@ -3,12 +3,21 @@ class Calendar {
         this.element = document.getElementById(elementId);
         this.type = type;
         if (!this.element) return;
-        
+
         this.currentDate = new Date();
         this.events = [];
-        
+
         this.init();
         this.fetchEvents();
+
+        // Add month navigation event listeners
+        this.element.addEventListener('click', (e) => {
+            if (e.target.classList.contains('prev-month')) {
+                this.previousMonth();
+            } else if (e.target.classList.contains('next-month')) {
+                this.nextMonth();
+            }
+        });
     }
 
     init() {
@@ -27,7 +36,7 @@ class Calendar {
             const response = await fetch(`/api/daily-logs/${dateStr}`);
             if (!response.ok) throw new Error('Failed to fetch logs');
             const data = await response.json();
-            
+
             // Format date for display
             const displayDate = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
                 weekday: 'long',
@@ -38,13 +47,13 @@ class Calendar {
 
             // Check if we're on the dashboard or a specific log page
             const isDashboard = document.querySelector('.dashboard-grid');
-            
+
             if (isDashboard) {
                 // Update modal content for dashboard
                 document.getElementById('selectedDate').textContent = displayDate;
-                
+
                 // Update medication logs with styled time at the top
-                const medLogsHtml = data.medications.length ? 
+                const medLogsHtml = data.medications.length ?
                     data.medications.map(med => `
                         <div class="daily-log-item">
                             <div class="log-time-display">${formatTime(med.time)}</div>
@@ -53,7 +62,7 @@ class Calendar {
                             </div>
                         </div>
                     `).join('') : '<p class="no-logs">No medications logged</p>';
-                
+
                 // Update seizure logs with styled time
                 const seizureLogsHtml = data.seizures.length ?
                     data.seizures.map(seizure => `
@@ -66,7 +75,7 @@ class Calendar {
                             </div>
                         </div>
                     `).join('') : '<p class="no-logs">No seizures logged</p>';
-                
+
                 // Update trigger logs with styled time
                 const triggerLogsHtml = data.triggers.length ?
                     data.triggers.map(trigger => `
@@ -100,7 +109,7 @@ class Calendar {
                 const logsSection = document.getElementById('selected-day-logs');
                 if (logsSection) {
                     if (this.type === 'medication') {
-                        const medHtml = data.medications.length ? 
+                        const medHtml = data.medications.length ?
                             `<div class="log-date-section">
                                 <h3>${displayDate}</h3>
                              </div>
@@ -118,7 +127,7 @@ class Calendar {
                                         </div>
                                     </div>
                                 </div>
-                             `).join('')}` : 
+                             `).join('')}` :
                             `<p class="no-logs"><em>There are no logs for ${displayDate}.</em></p>`;
                         logsSection.innerHTML = medHtml;
                     } else if (this.type === 'seizure') {
@@ -185,8 +194,26 @@ class Calendar {
 
     async fetchEvents() {
         try {
-            const response = await fetch(`/api/events/${this.type}`);
-            this.events = await response.json();
+            if (this.type === 'unified') {
+                const [medications, seizures, triggers] = await Promise.all([
+                    fetch('/api/events/medication').then(r => r.json()),
+                    fetch('/api/events/seizure').then(r => r.json()),
+                    fetch('/api/events/trigger').then(r => r.json())
+                ]);
+
+                this.events = {
+                    medication: medications,
+                    seizure: seizures,
+                    trigger: triggers
+                };
+            } else {
+                // For individual calendar pages
+                const response = await fetch(`/api/events/${this.type}`);
+                const events = await response.json();
+                this.events = {
+                    [this.type]: events
+                };
+            }
             this.render();
         } catch (error) {
             console.error('Error fetching events:', error);
@@ -208,9 +235,9 @@ class Calendar {
 
         let html = `
             <div class="calendar-header">
-                <button onclick="calendars['${this.element.id}'].previousMonth()">&lt;</button>
+                <button class="prev-month">&lt;</button>
                 <h3>${this.currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</h3>
-                <button onclick="calendars['${this.element.id}'].nextMonth()">&gt;</button>
+                <button class="next-month">&gt;</button>
             </div>
             <div class="calendar-grid">
                 <div>Sun</div>
@@ -228,24 +255,81 @@ class Calendar {
 
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), day);
-            const hasEvent = this.events.some(event => {
-                const eventDate = new Date(event.date);
-                return eventDate.toDateString() === date.toDateString();
-            });
-
+            const dateStr = date.toISOString().split('T')[0];
             const isToday = date.toDateString() === new Date().toDateString();
 
+            let eventDots = '';
+
+            if (this.type === 'unified') {
+                // For dashboard: show all event types
+                const hasEvents = {
+                    medication: this.events.medication?.some(event => event.date.startsWith(dateStr)),
+                    seizure: this.events.seizure?.some(event => event.date.startsWith(dateStr)),
+                    trigger: this.events.trigger?.some(event => event.date.startsWith(dateStr))
+                };
+
+                eventDots = Object.entries(hasEvents)
+                    .filter(([_, has]) => has)
+                    .map(([type, _]) => `<span class="event-dot ${type}"></span>`)
+                    .join('');
+            } else {
+                // For individual pages: show only that type's events
+                const hasEvent = this.events[this.type]?.some(event => event.date.startsWith(dateStr));
+                if (hasEvent) {
+                    eventDots = `<span class="event-dot ${this.type}"></span>`;
+                }
+            }
+
             html += `
-                <div class="calendar-day ${hasEvent ? 'has-event' : ''} ${isToday ? 'today' : ''}" 
-                     data-date="${date.toISOString().split('T')[0]}"
-                     onclick="calendar.handleDayClick('${date.toISOString().split('T')[0]}')">
+                <div class="calendar-day ${isToday ? 'today' : ''}" 
+                     data-date="${dateStr}"
+                     onclick="calendar.handleDayClick('${dateStr}')">
                     ${day}
-                    ${hasEvent ? `<span class="event-dot ${this.type}"></span>` : ''}
+                    <div class="event-indicators">
+                        ${eventDots}
+                    </div>
                 </div>
             `;
         }
 
         html += '</div>';
+
+        // Add legend based on calendar type
+        if (this.type === 'unified') {
+            html += `
+                <div class="calendar-legend">
+                    <div class="legend-item">
+                        <span class="event-dot medication"></span>
+                        <span>Medication</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="event-dot seizure"></span>
+                        <span>Seizure</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="event-dot trigger"></span>
+                        <span>Trigger</span>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Add single legend item for individual pages
+            const legendLabels = {
+                medication: 'Medication',
+                seizure: 'Seizure',
+                trigger: 'Trigger'
+            };
+            
+            html += `
+                <div class="calendar-legend">
+                    <div class="legend-item">
+                        <span class="event-dot ${this.type}"></span>
+                        <span>${legendLabels[this.type]}</span>
+                    </div>
+                </div>
+            `;
+        }
+
         this.element.innerHTML = html;
     }
 
@@ -265,13 +349,13 @@ class Calendar {
         const dayElement = document.createElement('div');
         dayElement.className = 'calendar-day';
         dayElement.textContent = date.getDate();
-        
+
         // Add the date attribute in YYYY-MM-DD format
         const dateStr = date.toISOString().split('T')[0];
         dayElement.dataset.date = dateStr;
-        
+
         // ... rest of the renderDay method ...
-        
+
         return dayElement;
     }
 }
@@ -297,18 +381,36 @@ function closeModal() {
 
 // Initialize calendars
 document.addEventListener('DOMContentLoaded', () => {
-    window.calendars = {
-        'medication-calendar': new Calendar('medication-calendar', 'medication'),
-        'seizure-calendar': new Calendar('seizure-calendar', 'seizure'),
-        'trigger-calendar': new Calendar('trigger-calendar', 'trigger')
-    };
+    // Initialize unified calendar for dashboard
+    if (document.getElementById('unified-calendar')) {
+        const unifiedCalendar = new Calendar('unified-calendar', 'unified');
 
-    // Close modal when clicking outside
-    window.onclick = function (event) {
-        if (event.target.classList.contains('modal')) {
-            closeModal();
+        // Fetch all event types
+        Promise.all([
+            fetch('/api/events/medication'),
+            fetch('/api/events/seizure'),
+            fetch('/api/events/trigger')
+        ])
+            .then(responses => Promise.all(responses.map(r => r.json())))
+            .then(([medications, seizures, triggers]) => {
+                unifiedCalendar.events = {
+                    medication: medications,
+                    seizure: seizures,
+                    trigger: triggers
+                };
+                unifiedCalendar.render();
+            })
+            .catch(error => console.error('Error fetching events:', error));
+    }
+
+    // Initialize individual calendars for specific pages
+    const calendarTypes = ['medication', 'seizure', 'trigger'];
+    calendarTypes.forEach(type => {
+        const calendar = document.getElementById(`${type}-calendar`);
+        if (calendar) {
+            new Calendar(`${type}-calendar`, type);
         }
-    };
+    });
 });
 
 // Add this function
@@ -358,16 +460,16 @@ async function showDailyLogs(date) {
 
         // Update modal content
         document.getElementById('selectedDate').textContent = new Date(date).toLocaleDateString();
-        
+
         // Update medication logs
-        const medLogsHtml = medications.length ? 
+        const medLogsHtml = medications.length ?
             medications.map(med => `
                 <div class="daily-log-item">
                     <div>${formatTime(med.time)}</div>
                     <strong>${med.name}</strong> - ${med.dosage}
                 </div>
             `).join('') : '<p class="no-logs">No medications logged</p>';
-        
+
         // Update seizure logs
         const seizureLogsHtml = seizures.length ?
             seizures.map(seizure => `
@@ -378,7 +480,7 @@ async function showDailyLogs(date) {
                     <div>Duration: ${seizure.duration} minutes</div>
                 </div>
             `).join('') : '<p class="no-logs">No seizures logged</p>';
-        
+
         // Update trigger logs
         const triggerLogsHtml = triggers.length ?
             triggers.map(trigger => `

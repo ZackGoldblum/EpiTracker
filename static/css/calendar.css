@@ -2,6 +2,7 @@
     background: white;
     border-radius: 8px;
     padding: 1rem;
+    padding-bottom: 0rem;
     margin-bottom: 1rem;
 }
 
@@ -44,14 +45,21 @@
     box-shadow: 0 0 0 1px var(--primary-color);
 }
 
-.event-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+.event-indicators {
     position: absolute;
     bottom: 4px;
     left: 50%;
     transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+}
+
+.event-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    position: static;
+    transform: none;
 }
 
 .event-dot.medication {
@@ -67,4 +75,28 @@
 .event-dot.trigger {
     background-color: #ff9800;
     box-shadow: 0 0 0 1px rgba(255, 152, 0, 0.3);
+}
+
+.calendar-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-color);
+}
+
+.legend-item .event-dot {
+    position: static;
+    transform: none;
+    width: 8px;
+    height: 8px;
 }
