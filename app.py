@@ -364,6 +364,7 @@ def get_insights_history():
 def get_drug_levels(medication_name):
     # Get days parameter from query string, default to 7 days
     days = int(request.args.get('days', 7))
+    show_seizures = request.args.get('showSeizures', 'false').lower() == 'true'
     
     # Calculate date range
     end_date = datetime.now()
@@ -382,13 +383,30 @@ def get_drug_levels(medication_name):
     
     times, concentrations = calculate_drug_levels(medications, DRUG_PARAMS[medication_name])
     
+    # Get seizure data if requested
+    seizures = []
+    if show_seizures:
+        seizures = Seizure.query.filter(
+            Seizure.user_id == current_user.id,
+            Seizure.timestamp >= start_date,
+            Seizure.timestamp <= end_date
+        ).order_by(Seizure.timestamp.asc()).all()
+        
+        seizures = [{
+            'timestamp': seizure.timestamp.isoformat(),
+            'type': seizure.type,
+            'severity': seizure.severity,
+            'duration': seizure.duration
+        } for seizure in seizures]
+    
     return jsonify({
         'times': [t.isoformat() for t in times],
         'concentrations': concentrations,
         'therapeutic_range': {
             'min': DRUG_PARAMS[medication_name]['therapeutic_min'],
             'max': DRUG_PARAMS[medication_name]['therapeutic_max']
-        }
+        },
+        'seizures': seizures
     })
 
 

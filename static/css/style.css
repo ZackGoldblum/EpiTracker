@@ -319,6 +319,7 @@ footer * {
         transform: translateY(-20px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -337,7 +338,8 @@ footer * {
 
 /* Calendar Styles */
 .calendar,
-.calendar * {  /* This ensures all calendar children inherit the text color */
+.calendar * {
+    /* This ensures all calendar children inherit the text color */
     color: var(--text-color) !important;
 }
 
@@ -754,12 +756,15 @@ h2 {
 
 .modal-actions {
     display: flex;
-    justify-content: flex-end; /* Aligns items to the right */
-    margin-top: 1rem; /* Adds some space above the buttons */
+    justify-content: flex-end;
+    /* Aligns items to the right */
+    margin-top: 1rem;
+    /* Adds some space above the buttons */
 }
 
 .modal-actions .btn-secondary {
-    margin-left: 1rem; /* Adds space between the buttons */
+    margin-left: 1rem;
+    /* Adds space between the buttons */
 }
 
 .selected-day-logs h3 {
@@ -1067,8 +1072,13 @@ h2 {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 #analysis-content {
@@ -1212,6 +1222,7 @@ h2 {
 
 .controls {
     display: flex;
+    align-items: center;
     gap: 1rem;
 }
 
@@ -1224,4 +1235,53 @@ h2 {
 
 .dashboard-section {
     padding: 1.5rem;
+}
+
+/* Toggle Container */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+/* Toggle Label */
+.toggle-label {
+    margin-right: 0rem;
+    pointer-events: none;
+    cursor: default;
+    user-select: none;
+}
+
+/* Custom Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 54px;
+    height: 24px;
+    background-color: #ccc;
+    border-radius: 12px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.toggle-switch.active {
+    background-color: var(--primary-color);
+}
+
+.toggle-switch:before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.toggle-switch.active:before {
+    transform: translateX(15px);
 }
