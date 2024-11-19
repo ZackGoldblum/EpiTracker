@@ -10,6 +10,7 @@ from flask_login import (
 from models.database import db, User, Medication, Seizure, Trigger, InsightHistory
 from werkzeug.security import generate_password_hash, check_password_hash
 from openai_service import generate_insights
+from models.pharmacokinetics import calculate_drug_levels
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "your-secret-key"  # Change this in production
@@ -342,6 +343,56 @@ def get_insights_history():
         'analysis': h.analysis,
         'generated_at': h.generated_at.isoformat()
     } for h in history])
+
+@app.route('/api/drug_levels/<medication_name>')
+@login_required
+def get_drug_levels(medication_name):
+    # Get days parameter from query string, default to 7 days
+    days = int(request.args.get('days', 7))
+    
+    # Calculate date range
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=days)
+    
+    # Get medication history for the user within date range
+    medications = Medication.query.filter(
+        Medication.user_id == current_user.id,
+        Medication.name == medication_name,
+        Medication.timestamp >= start_date,
+        Medication.timestamp <= end_date
+    ).order_by(Medication.timestamp.asc()).all()
+    
+    # Drug-specific parameters
+    drug_params = {
+        'Levetiracetam': {
+            'half_life': 7,  # hours
+            'vd': 0.7,      # L/kg
+            'bioavailability': 1.0,
+            'therapeutic_min': 12,  # mg/L
+            'therapeutic_max': 46   # mg/L
+        },
+        'Lamotrigine': {
+            'half_life': 25,  # hours
+            'vd': 1.2,       # L/kg
+            'bioavailability': 0.98,
+            'therapeutic_min': 3,   # mg/L
+            'therapeutic_max': 14   # mg/L
+        }
+    }
+    
+    if medication_name not in drug_params:
+        return jsonify({'error': 'Medication not supported'}), 400
+    
+    times, concentrations = calculate_drug_levels(medications, drug_params[medication_name])
+    
+    return jsonify({
+        'times': [t.isoformat() for t in times],
+        'concentrations': concentrations,
+        'therapeutic_range': {
+            'min': drug_params[medication_name]['therapeutic_min'],
+            'max': drug_params[medication_name]['therapeutic_max']
+        }
+    })
 
 
 if __name__ == "__main__":

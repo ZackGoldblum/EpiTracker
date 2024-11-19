@@ -25,4 +25,24 @@
         <button type="button" class="btn-secondary" onclick="closeModal()">Close</button>
     </div>
 </div>
+
+<div class="dashboard-section">
+    <div class="section-header">
+        <h2>ASM Blood Levels</h2>
+        <div class="controls">
+            <select id="medication-select" onchange="updateASMPlot()">
+                <option value="Levetiracetam">Levetiracetam</option>
+                <option value="Lamotrigine">Lamotrigine</option>
+            </select>
+            <select id="timeframe-select" onchange="updateASMPlot()">
+                <option value="7">Last 7 days</option>
+                <option value="14">Last 14 days</option>
+                <option value="30">Last 30 days</option>
+            </select>
+        </div>
+    </div>
+    <div class="asm-plot-container">
+        <canvas id="asmLevelsChart"></canvas>
+    </div>
+</div>
 {% endblock %}
