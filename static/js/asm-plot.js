@@ -41,7 +41,10 @@ async function updateASMPlot() {
                 };
             });
         }
-        
+
+        // Get the current date and time
+        const currentDate = new Date().toISOString();
+
         asmChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -93,7 +96,8 @@ async function updateASMPlot() {
                         title: {
                             display: true,
                             text: 'Date'
-                        }
+                        },
+                        max: currentDate // Set the maximum value to the current date and time
                     },
                     y: {
                         beginAtZero: true,
