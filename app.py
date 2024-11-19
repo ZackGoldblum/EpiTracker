@@ -99,6 +99,8 @@ def add_medication():
         
         datetime_str = request.form.get("datetime")
         medication_datetime = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M')
+        # Truncate seconds and microseconds
+        medication_datetime = medication_datetime.replace(second=0, microsecond=0)
         
         medication = Medication(
             name=name,
@@ -123,9 +125,13 @@ def add_seizure():
         # Get the seizure type (either from select or custom input)
         seizure_type = request.form.get("type") or request.form.get("custom_type")
         
+        # Parse and truncate timestamp
+        timestamp = datetime.strptime(request.form['timestamp'], '%Y-%m-%dT%H:%M')
+        timestamp = timestamp.replace(second=0, microsecond=0)
+        
         seizure = Seizure(
             user_id=current_user.id,
-            timestamp=datetime.strptime(request.form['timestamp'], '%Y-%m-%dT%H:%M'),
+            timestamp=timestamp,
             type=seizure_type,
             severity=int(request.form['severity']),
             duration=int(request.form['duration'])
@@ -146,12 +152,17 @@ def add_trigger():
         # Get the trigger type (either from select or custom input)
         trigger_type = request.form.get("type") or request.form.get("custom_type")
         notes = request.form.get("notes")
+        
+        # Parse and truncate timestamp
         datetime_str = request.form.get("timestamp")
+        trigger_datetime = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M')
+        trigger_datetime = trigger_datetime.replace(second=0, microsecond=0)
+        print(trigger_datetime)
         
         trigger = Trigger(
             type=trigger_type,
             notes=notes,
-            timestamp=datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M'),
+            timestamp=trigger_datetime,
             user_id=current_user.id
         )
         
