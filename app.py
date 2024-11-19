@@ -11,6 +11,7 @@ from models.database import db, User, Medication, Seizure, Trigger, InsightHisto
 from werkzeug.security import generate_password_hash, check_password_hash
 from openai_service import generate_insights
 from models.pharmacokinetics import calculate_drug_levels
+import json
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "your-secret-key"  # Change this in production
@@ -22,6 +23,9 @@ login_manager.login_view = "login"
 
 db.init_app(app)
 
+# Load drug parameters from JSON file
+with open('drug_params.json') as f:
+    DRUG_PARAMS = json.load(f)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -373,35 +377,17 @@ def get_drug_levels(medication_name):
         Medication.timestamp <= end_date
     ).order_by(Medication.timestamp.asc()).all()
     
-    # Drug-specific parameters
-    drug_params = {
-        'Levetiracetam': {
-            'half_life': 7,  # hours
-            'vd': 0.7,      # L/kg
-            'bioavailability': 1.0,
-            'therapeutic_min': 12,  # mg/L
-            'therapeutic_max': 46   # mg/L
-        },
-        'Lamotrigine': {
-            'half_life': 25,  # hours
-            'vd': 1.2,       # L/kg
-            'bioavailability': 0.98,
-            'therapeutic_min': 3,   # mg/L
-            'therapeutic_max': 14   # mg/L
-        }
-    }
-    
-    if medication_name not in drug_params:
+    if medication_name not in DRUG_PARAMS:
         return jsonify({'error': 'Medication not supported'}), 400
     
-    times, concentrations = calculate_drug_levels(medications, drug_params[medication_name])
+    times, concentrations = calculate_drug_levels(medications, DRUG_PARAMS[medication_name])
     
     return jsonify({
         'times': [t.isoformat() for t in times],
         'concentrations': concentrations,
         'therapeutic_range': {
-            'min': drug_params[medication_name]['therapeutic_min'],
-            'max': drug_params[medication_name]['therapeutic_max']
+            'min': DRUG_PARAMS[medication_name]['therapeutic_min'],
+            'max': DRUG_PARAMS[medication_name]['therapeutic_max']
         }
     })
 
