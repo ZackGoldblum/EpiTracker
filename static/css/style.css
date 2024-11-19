@@ -1251,6 +1251,7 @@ h2 {
     pointer-events: none;
     cursor: default;
     user-select: none;
+    font-size: small;
 }
 
 /* Custom Toggle Switch */

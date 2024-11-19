@@ -93,10 +93,6 @@ async function updateASMPlot() {
                             maxRotation: 0,
                             source: 'auto'
                         },
-                        title: {
-                            display: true,
-                            text: 'Date'
-                        },
                         max: currentDate // Set the maximum value to the current date and time
                     },
                     y: {
