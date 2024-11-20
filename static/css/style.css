@@ -518,20 +518,6 @@ h2 {
     gap: 1rem;
 }
 
-.log-item {
-    background: white;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 0rem;
-    border: 1px solid var(--border-color);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.log-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
 .log-date {
     color: var(--text-muted);
     font-size: 0.9rem;
