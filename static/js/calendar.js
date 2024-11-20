@@ -372,16 +372,52 @@ class Calendar {
     }
 }
 
-// Modal functions
-function showAddMedicationModal() {
+// Handle the transition between modals
+function openFormFromDailyLogs() {
+    // Get the selected date from the daily logs modal
+    const selectedDateText = document.getElementById('selectedDateView').textContent;
+    const selectedDate = new Date(selectedDateText);
+    
+    // Close the daily logs modal
+    document.getElementById('dailyLogsViewModal').style.display = 'none';
+    
+    // Set the time to 00:00 (midnight)
+    selectedDate.setHours(0);
+    selectedDate.setMinutes(0);
+    
+    // Format the date for the datetime-local input (YYYY-MM-DDT00:00)
+    const formattedDateTime = new Date(selectedDate - selectedDate.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
+    
+    // Set the datetime in the form that's about to open
+    setTimeout(() => {
+        const datetimeInputs = document.querySelectorAll('input[type="datetime-local"]');
+        datetimeInputs.forEach(input => {
+            input.value = formattedDateTime;
+        });
+    }, 0);
+}
+
+// Update the existing modal functions to include the date transition
+function showAddMedicationModal(fromDailyLogs = false) {
+    if (fromDailyLogs) {
+        openFormFromDailyLogs();
+    }
     document.getElementById('addMedicationModal').style.display = 'block';
 }
 
-function showAddSeizureModal() {
+function showAddSeizureModal(fromDailyLogs = false) {
+    if (fromDailyLogs) {
+        openFormFromDailyLogs();
+    }
     document.getElementById('addSeizureModal').style.display = 'block';
 }
 
-function showAddTriggerModal() {
+function showAddTriggerModal(fromDailyLogs = false) {
+    if (fromDailyLogs) {
+        openFormFromDailyLogs();
+    }
     document.getElementById('addTriggerModal').style.display = 'block';
 }
 

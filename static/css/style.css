@@ -743,14 +743,17 @@ h2 {
 .modal-actions {
     display: flex;
     justify-content: flex-end;
-    /* Aligns items to the right */
-    margin-top: 1rem;
-    /* Adds some space above the buttons */
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.modal-actions .btn-primary {
+    margin-right: auto;
 }
 
 .modal-actions .btn-secondary {
-    margin-left: 1rem;
-    /* Adds space between the buttons */
+    margin-left: 0;
 }
 
 .selected-day-logs h3 {

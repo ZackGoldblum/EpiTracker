@@ -6,7 +6,7 @@
 <div class="log-container">
     <div class="header-section">
         <h2>Medication Log</h2>
-        <button class="btn-primary" onclick="showAddMedicationModal()">
+        <button type="button" class="btn-primary" onclick="showAddMedicationModal(true)">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
@@ -75,7 +75,15 @@
         <div id="dailyLogsView">
             <div id="medicationLogsView"></div>
         </div>
-        <button type="button" class="btn-secondary" onclick="closeDailyLogsModal()">Close</button>
+        <div class="modal-actions">
+            <button type="button" class="btn-primary" onclick="showAddMedicationModal(true)">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Add Medication
+            </button>
+            <button type="button" class="btn-secondary" onclick="closeDailyLogsModal()">Close</button>
+        </div>
     </div>
 </div>
 {% endblock %}
