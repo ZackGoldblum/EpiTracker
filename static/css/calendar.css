@@ -100,3 +100,7 @@
     width: 8px;
     height: 8px;
 }
+
+.calendar-day.selected {
+    background-color: var(--secondary-color);
+}

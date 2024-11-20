@@ -6,6 +6,7 @@ class Calendar {
 
         this.currentDate = new Date();
         this.events = [];
+        this.selectedDay = null;
 
         this.init();
         this.fetchEvents();
@@ -33,6 +34,18 @@ class Calendar {
 
     async handleDayClick(dateStr) {
         try {
+            // Remove previous selection
+            if (this.selectedDay) {
+                this.selectedDay.classList.remove('selected');
+            }
+
+            // Add selection to clicked day
+            const clickedDay = this.element.querySelector(`[data-date="${dateStr}"]`);
+            if (clickedDay) {
+                clickedDay.classList.add('selected');
+                this.selectedDay = clickedDay;
+            }
+
             const response = await fetch(`/api/daily-logs/${dateStr}`);
             if (!response.ok) throw new Error('Failed to fetch logs');
             const data = await response.json();
@@ -354,6 +367,11 @@ class Calendar {
         const dateStr = date.toISOString().split('T')[0];
         dayElement.dataset.date = dateStr;
 
+        // Add selected class if this is the selected day
+        if (this.selectedDay && this.selectedDay.dataset.date === date.toISOString().split('T')[0]) {
+            dayElement.classList.add('selected');
+        }
+
         // ... rest of the renderDay method ...
 
         return dayElement;
@@ -379,6 +397,11 @@ function closeModal(event) {
     if (!event || event.target.classList.contains('modal')) {
         document.querySelectorAll('.modal').forEach(modal => {
             modal.style.display = 'none';
+        });
+        
+        // Clear selected day highlighting from all calendars
+        document.querySelectorAll('.calendar-day.selected').forEach(day => {
+            day.classList.remove('selected');
         });
     }
 }
