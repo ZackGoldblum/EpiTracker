@@ -373,14 +373,23 @@ function showAddTriggerModal() {
     document.getElementById('addTriggerModal').style.display = 'block';
 }
 
-function closeModal() {
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.style.display = 'none';
-    });
+function closeModal(event) {
+    // If event exists and the click was directly on the modal backdrop
+    // (not on the modal content), or if no event (direct close button click)
+    if (!event || event.target.classList.contains('modal')) {
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.style.display = 'none';
+        });
+    }
 }
 
 // Initialize calendars
 document.addEventListener('DOMContentLoaded', () => {
+    // Add click event listeners to all modals for click-outside closing
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', closeModal);
+    });
+
     // Initialize unified calendar for dashboard
     if (document.getElementById('unified-calendar')) {
         const unifiedCalendar = new Calendar('unified-calendar', 'unified');
