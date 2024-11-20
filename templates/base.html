@@ -12,6 +12,11 @@
     <script src="{{ url_for('static', filename='js/mobile_nav.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/form-utils.js') }}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.1.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@2.3.0/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.0.0"></script>
+    <script src="{{ url_for('static', filename='js/asm-plot.js') }}" defer></script>
 </head>
 <body>
     {% if request.endpoint not in ['login', 'register'] %}

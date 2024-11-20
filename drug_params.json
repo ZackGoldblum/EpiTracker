@@ -1,0 +1,16 @@
+{
+    "Levetiracetam": {
+        "half_life": 7,
+        "vd": 0.7,
+        "bioavailability": 1.0,
+        "therapeutic_min": 12,
+        "therapeutic_max": 46
+    },
+    "Lamotrigine": {
+        "half_life": 25,
+        "vd": 1.2,
+        "bioavailability": 0.98,
+        "therapeutic_min": 3,
+        "therapeutic_max": 14
+    }
+}

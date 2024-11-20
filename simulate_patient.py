@@ -19,7 +19,7 @@ def generate_medication_schedule(user_id, start_date, end_date):
     # Morning and evening Levetiracetam
     while current_date <= end_date:
         # Morning dose (8 AM)
-        morning_time = current_date.replace(hour=8, minute=0)
+        morning_time = current_date.replace(hour=8, minute=0, second=0, microsecond=0)
         # Occasionally miss or delay morning dose (10% chance)
         if random.random() > 0.1:
             medications.append(Medication(
@@ -31,7 +31,7 @@ def generate_medication_schedule(user_id, start_date, end_date):
             ))
         
         # Evening dose (8 PM)
-        evening_time = current_date.replace(hour=20, minute=0)
+        evening_time = current_date.replace(hour=20, minute=0, second=0, microsecond=0)
         # Occasionally miss or delay evening dose (15% chance)
         if random.random() > 0.15:
             medications.append(Medication(
@@ -52,6 +52,7 @@ def generate_seizure_events(user_id, start_date, end_date, missed_meds):
     for missed_med in missed_meds:
         if random.random() < 0.7:  # Chance of seizure after missed medication
             seizure_time = missed_med.timestamp + timedelta(hours=random.randint(2, 8))
+            seizure_time = seizure_time.replace(minute=0, second=0, microsecond=0)  # Round to hour
             if start_date <= seizure_time <= end_date:
                 seizures.append(Seizure(
                     user_id=user_id,
@@ -67,7 +68,9 @@ def generate_seizure_events(user_id, start_date, end_date, missed_meds):
         if random.random() < 0.15:  # Chance of random seizure on any day
             seizure_time = current_date.replace(
                 hour=random.randint(8, 22),
-                minute=random.randint(0, 59)
+                minute=0,  # Set to start of hour
+                second=0,
+                microsecond=0
             )
             seizures.append(Seizure(
                 user_id=user_id,
@@ -93,6 +96,7 @@ def generate_triggers(user_id, seizures, start_date, end_date):
     for seizure in seizures:
         if random.random() < 0.85:  # Chance of identified trigger before seizure
             trigger_time = seizure.timestamp - timedelta(hours=random.randint(1, 4))
+            trigger_time = trigger_time.replace(minute=0, second=0, microsecond=0)  # Round to hour
             trigger_type = random.choice(trigger_types)
             
             notes = ""
@@ -117,7 +121,9 @@ def generate_triggers(user_id, seizures, start_date, end_date):
         if random.random() < 0.15:  # Chance of random trigger on any day
             trigger_time = current_date.replace(
                 hour=random.randint(8, 22),
-                minute=random.randint(0, 59)
+                minute=0,  # Set to start of hour
+                second=0,
+                microsecond=0
             )
             triggers.append(Trigger(
                 user_id=user_id,

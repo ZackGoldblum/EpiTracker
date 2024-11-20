@@ -10,6 +10,8 @@ from flask_login import (
 from models.database import db, User, Medication, Seizure, Trigger, InsightHistory
 from werkzeug.security import generate_password_hash, check_password_hash
 from openai_service import generate_insights
+from models.pharmacokinetics import calculate_drug_levels
+import json
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "your-secret-key"  # Change this in production
@@ -21,6 +23,9 @@ login_manager.login_view = "login"
 
 db.init_app(app)
 
+# Load drug parameters from JSON file
+with open('drug_params.json') as f:
+    DRUG_PARAMS = json.load(f)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -98,6 +103,8 @@ def add_medication():
         
         datetime_str = request.form.get("datetime")
         medication_datetime = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M')
+        # Truncate seconds and microseconds
+        medication_datetime = medication_datetime.replace(second=0, microsecond=0)
         
         medication = Medication(
             name=name,
@@ -122,9 +129,13 @@ def add_seizure():
         # Get the seizure type (either from select or custom input)
         seizure_type = request.form.get("type") or request.form.get("custom_type")
         
+        # Parse and truncate timestamp
+        timestamp = datetime.strptime(request.form['timestamp'], '%Y-%m-%dT%H:%M')
+        timestamp = timestamp.replace(second=0, microsecond=0)
+        
         seizure = Seizure(
             user_id=current_user.id,
-            timestamp=datetime.strptime(request.form['timestamp'], '%Y-%m-%dT%H:%M'),
+            timestamp=timestamp,
             type=seizure_type,
             severity=int(request.form['severity']),
             duration=int(request.form['duration'])
@@ -145,12 +156,17 @@ def add_trigger():
         # Get the trigger type (either from select or custom input)
         trigger_type = request.form.get("type") or request.form.get("custom_type")
         notes = request.form.get("notes")
+        
+        # Parse and truncate timestamp
         datetime_str = request.form.get("timestamp")
+        trigger_datetime = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M')
+        trigger_datetime = trigger_datetime.replace(second=0, microsecond=0)
+        print(trigger_datetime)
         
         trigger = Trigger(
             type=trigger_type,
             notes=notes,
-            timestamp=datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M'),
+            timestamp=trigger_datetime,
             user_id=current_user.id
         )
         
@@ -342,6 +358,56 @@ def get_insights_history():
         'analysis': h.analysis,
         'generated_at': h.generated_at.isoformat()
     } for h in history])
+
+@app.route('/api/drug_levels/<medication_name>')
+@login_required
+def get_drug_levels(medication_name):
+    # Get days parameter from query string, default to 7 days
+    days = int(request.args.get('days', 7))
+    show_seizures = request.args.get('showSeizures', 'false').lower() == 'true'
+    
+    # Calculate date range
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=days)
+    
+    # Get medication history for the user within date range
+    medications = Medication.query.filter(
+        Medication.user_id == current_user.id,
+        Medication.name == medication_name,
+        Medication.timestamp >= start_date,
+        Medication.timestamp <= end_date
+    ).order_by(Medication.timestamp.asc()).all()
+    
+    if medication_name not in DRUG_PARAMS:
+        return jsonify({'error': 'Medication not supported'}), 400
+    
+    times, concentrations = calculate_drug_levels(medications, DRUG_PARAMS[medication_name])
+    
+    # Get seizure data if requested
+    seizures = []
+    if show_seizures:
+        seizures = Seizure.query.filter(
+            Seizure.user_id == current_user.id,
+            Seizure.timestamp >= start_date,
+            Seizure.timestamp <= end_date
+        ).order_by(Seizure.timestamp.asc()).all()
+        
+        seizures = [{
+            'timestamp': seizure.timestamp.isoformat(),
+            'type': seizure.type,
+            'severity': seizure.severity,
+            'duration': seizure.duration
+        } for seizure in seizures]
+    
+    return jsonify({
+        'times': [t.isoformat() for t in times],
+        'concentrations': concentrations,
+        'therapeutic_range': {
+            'min': DRUG_PARAMS[medication_name]['therapeutic_min'],
+            'max': DRUG_PARAMS[medication_name]['therapeutic_max']
+        },
+        'seizures': seizures
+    })
 
 
 if __name__ == "__main__":
