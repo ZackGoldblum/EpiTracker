@@ -487,10 +487,24 @@ function openFormFromDailyLogs() {
     }, 0);
 }
 
-// Update the existing modal functions to include the date transition
+// Helper function to get current formatted datetime
+function getCurrentFormattedDateTime() {
+    const now = new Date();
+    return new Date(now - now.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
+}
+
 function showAddMedicationModal(fromDailyLogs = false) {
     if (fromDailyLogs) {
         openFormFromDailyLogs();
+    } else {
+        setTimeout(() => {
+            const datetimeInput = document.querySelector('#medication-datetime');
+            if (datetimeInput) {
+                datetimeInput.value = getCurrentFormattedDateTime();
+            }
+        }, 0);
     }
     document.getElementById('addMedicationModal').style.display = 'block';
 }
@@ -498,6 +512,13 @@ function showAddMedicationModal(fromDailyLogs = false) {
 function showAddSeizureModal(fromDailyLogs = false) {
     if (fromDailyLogs) {
         openFormFromDailyLogs();
+    } else {
+        setTimeout(() => {
+            const datetimeInput = document.querySelector('#seizure-datetime');
+            if (datetimeInput) {
+                datetimeInput.value = getCurrentFormattedDateTime();
+            }
+        }, 0);
     }
     document.getElementById('addSeizureModal').style.display = 'block';
 }
@@ -505,6 +526,13 @@ function showAddSeizureModal(fromDailyLogs = false) {
 function showAddTriggerModal(fromDailyLogs = false) {
     if (fromDailyLogs) {
         openFormFromDailyLogs();
+    } else {
+        setTimeout(() => {
+            const datetimeInput = document.querySelector('#trigger-datetime');
+            if (datetimeInput) {
+                datetimeInput.value = getCurrentFormattedDateTime();
+            }
+        }, 0);
     }
     document.getElementById('addTriggerModal').style.display = 'block';
 }
