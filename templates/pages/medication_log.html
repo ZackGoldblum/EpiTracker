@@ -24,10 +24,10 @@
 </div>
 
 <!-- Add Medication Modal -->
-<div id="addMedicationModal" class="modal">
-    <div class="modal-content">
+<div id="addMedicationModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
         <h3>Add Medication</h3>
-        <form method="POST" action="{{ url_for('add_medication') }}">
+        <form method="POST" action="{{ url_for('add_medication') }}" class="add-log-form">
             <div class="form-group">
                 <label for="med-datetime">Date & Time</label>
                 <input type="datetime-local" id="med-datetime" name="datetime" required>
@@ -69,8 +69,8 @@
 </div>
 
 <!-- Daily Logs Modal -->
-<div id="dailyLogsViewModal" class="modal">
-    <div class="modal-content">
+<div id="dailyLogsViewModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
         <h3>Logs for <span id="selectedDateView"></span></h3>
         <div id="dailyLogsView">
             <div id="medicationLogsView"></div>

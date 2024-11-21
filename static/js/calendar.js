@@ -30,6 +30,73 @@ class Calendar {
                 this.handleDayClick(dayCell.dataset.date);
             }
         });
+
+        // Initialize form submissions
+        this.initFormSubmissions();
+    }
+
+    initFormSubmissions() {
+        // Add event listeners to all add forms
+        const forms = document.querySelectorAll('.add-log-form');
+        forms.forEach(form => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleFormSubmit(e.target);
+            });
+        });
+    }
+
+    async handleFormSubmit(form) {
+        // Disable the submit button to prevent double submission
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) {
+            submitButton.disabled = true;
+        }
+
+        try {
+            const formData = new FormData(form);
+            const action = form.action;
+            const method = form.method || 'POST';
+
+            const response = await fetch(action, {
+                method: method,
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Close the add modal
+                const addModal = form.closest('.modal');
+                if (addModal) {
+                    addModal.style.display = 'none';
+                }
+
+                // Re-fetch events to update calendar dots
+                await this.fetchEvents();
+                
+                // Re-fetch and display the daily logs for the specific date
+                if (result.date) {
+                    await this.handleDayClick(result.date);
+                }
+                
+                // Reset the form
+                form.reset();
+            } else {
+                alert(result.error || 'An error occurred.');
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('An unexpected error occurred.');
+        } finally {
+            // Re-enable the submit button
+            if (submitButton) {
+                submitButton.disabled = false;
+            }
+        }
     }
 
     async handleDayClick(dateStr) {
@@ -370,6 +437,20 @@ class Calendar {
 
         return formatters[type](logs);
     }
+
+    static closeModal(event) {
+        if (!event || event.target.classList.contains('modal')) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.style.display = 'none';
+            });
+            
+            // Clear selected day highlighting from all calendars
+            document.querySelectorAll('.calendar-day.selected').forEach(day => {
+                day.classList.remove('selected');
+            });
+        }
+    }
 }
 
 // Handle the transition between modals
@@ -422,56 +503,44 @@ function showAddTriggerModal(fromDailyLogs = false) {
 }
 
 function closeModal(event) {
-    // If event exists and the click was directly on the modal backdrop
-    // (not on the modal content), or if no event (direct close button click)
-    if (!event || event.target.classList.contains('modal')) {
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.style.display = 'none';
-        });
-        
-        // Clear selected day highlighting from all calendars
-        document.querySelectorAll('.calendar-day.selected').forEach(day => {
-            day.classList.remove('selected');
-        });
-    }
+    Calendar.closeModal(event);
 }
 
 // Initialize calendars
 document.addEventListener('DOMContentLoaded', () => {
-    // Add click event listeners to all modals for click-outside closing
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', closeModal);
-    });
+    // Initialize all calendars
+    const calendars = {
+        'medication-calendar': new Calendar('medication-calendar', 'medication'),
+        'seizure-calendar': new Calendar('seizure-calendar', 'seizure'),
+        'trigger-calendar': new Calendar('trigger-calendar', 'trigger'),
+        'unified-calendar': new Calendar('unified-calendar', 'unified')
+    };
 
-    // Initialize unified calendar for dashboard
-    if (document.getElementById('unified-calendar')) {
-        const unifiedCalendar = new Calendar('unified-calendar', 'unified');
-
-        // Fetch all event types
-        Promise.all([
-            fetch('/api/events/medication'),
-            fetch('/api/events/seizure'),
-            fetch('/api/events/trigger')
-        ])
-            .then(responses => Promise.all(responses.map(r => r.json())))
-            .then(([medications, seizures, triggers]) => {
-                unifiedCalendar.events = {
-                    medication: medications,
-                    seizure: seizures,
-                    trigger: triggers
-                };
-                unifiedCalendar.render();
-            })
-            .catch(error => console.error('Error fetching events:', error));
+    // Add modal HTML to each log page if it doesn't exist
+    if (!document.getElementById('dailyLogsModal')) {
+        const modalHTML = `
+            <div id="dailyLogsModal" class="modal">
+                <div class="modal-content">
+                    <h3>Logs for <span id="selectedDate"></span></h3>
+                    <div id="dailyLogs">
+                        <div id="medicationLogs"></div>
+                        <div id="seizureLogs"></div>
+                        <div id="triggerLogs"></div>
+                    </div>
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Close</button>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
-
-    // Initialize individual calendars for specific pages
-    const calendarTypes = ['medication', 'seizure', 'trigger'];
-    calendarTypes.forEach(type => {
-        const calendar = document.getElementById(`${type}-calendar`);
-        if (calendar) {
-            new Calendar(`${type}-calendar`, type);
-        }
+    
+    // Add click event listeners to all modals for background click closing
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal(e);
+            }
+        });
     });
 });
 

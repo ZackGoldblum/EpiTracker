@@ -24,10 +24,10 @@
 </div>
 
 <!-- Add Seizure Modal -->
-<div id="addSeizureModal" class="modal">
-    <div class="modal-content">
+<div id="addSeizureModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
         <h3>Log Seizure Event</h3>
-        <form method="POST" action="{{ url_for('add_seizure') }}">
+        <form method="POST" action="{{ url_for('add_seizure') }}" class="add-log-form">
             <div class="form-group">
                 <label for="seizure-datetime">Date & Time</label>
                 <input type="datetime-local" id="seizure-datetime" name="timestamp" required value="{{ current_time }}">
@@ -95,8 +95,8 @@
 </div>
 
 <!-- Daily Logs Modal -->
-<div id="dailyLogsViewModal" class="modal">
-    <div class="modal-content">
+<div id="dailyLogsViewModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
         <h3>Logs for <span id="selectedDateView"></span></h3>
         <div id="dailyLogsView">
             <div id="seizureLogsView"></div>
