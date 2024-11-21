@@ -469,14 +469,22 @@ function openFormFromDailyLogs() {
     // Close the daily logs modal
     document.getElementById('dailyLogsViewModal').style.display = 'none';
     
-    // Set the time to 00:00 (midnight)
-    selectedDate.setHours(0);
-    selectedDate.setMinutes(0);
+    // Check if selected date is today
+    const today = new Date();
+    const isToday = selectedDate.toDateString() === today.toDateString();
     
-    // Format the date for the datetime-local input (YYYY-MM-DDT00:00)
-    const formattedDateTime = new Date(selectedDate - selectedDate.getTimezoneOffset() * 60000)
-        .toISOString()
-        .slice(0, 16);
+    let formattedDateTime;
+    if (isToday) {
+        // If it's today, use current time
+        formattedDateTime = getCurrentFormattedDateTime();
+    } else {
+        // For other days, use midnight (00:00)
+        selectedDate.setHours(0);
+        selectedDate.setMinutes(0);
+        formattedDateTime = new Date(selectedDate - selectedDate.getTimezoneOffset() * 60000)
+            .toISOString()
+            .slice(0, 16);
+    }
     
     // Set the datetime in the form that's about to open
     setTimeout(() => {
