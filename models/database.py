@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
+from sqlalchemy import UniqueConstraint
 
 db = SQLAlchemy()
 
@@ -16,28 +17,44 @@ class User(UserMixin, db.Model):
 
 class Medication(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     dosage = db.Column(db.String(100), nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False)
     taken = db.Column(db.Boolean, default=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "name", "dosage", "taken", "timestamp", name="_medication_uc"
+        ),
+    )
 
 
 class Seizure(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False)
     type = db.Column(db.String(100), nullable=False)
     severity = db.Column(db.Integer, nullable=False)  # 1-10 scale
     duration = db.Column(db.Integer)  # in minutes
+    timestamp = db.Column(db.DateTime, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "type", "severity", "duration", "timestamp", name="_seizure_uc"
+        ),
+    )
 
 
 class Trigger(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     type = db.Column(db.String(100), nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False)
     notes = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "type", "notes", "timestamp", name="_trigger_uc"),
+    )
 
 
 class InsightHistory(db.Model):

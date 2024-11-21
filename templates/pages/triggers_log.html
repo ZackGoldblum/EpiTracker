@@ -6,7 +6,7 @@
 <div class="log-container">
     <div class="header-section">
         <h2>Triggers Log</h2>
-        <button class="btn-primary" onclick="showAddTriggerModal()">
+        <button class="btn-primary" onclick="showAddTriggerModal(false)">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
@@ -24,10 +24,10 @@
 </div>
 
 <!-- Add Trigger Modal -->
-<div id="addTriggerModal" class="modal">
-    <div class="modal-content">
+<div id="addTriggerModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
         <h3>Log Trigger</h3>
-        <form method="POST" action="{{ url_for('add_trigger') }}">
+        <form method="POST" action="{{ url_for('add_trigger') }}" class="add-log-form">
             <div class="form-group">
                 <label for="trigger-datetime">Date & Time</label>
                 <input type="datetime-local" id="trigger-datetime" name="timestamp" required>
@@ -72,13 +72,21 @@
 </div>
 
 <!-- Daily Logs Modal -->
-<div id="dailyLogsModal" class="modal">
-    <div class="modal-content">
-        <h3>Logs for <span id="selectedDate"></span></h3>
-        <div id="dailyLogs">
-            <div id="triggerLogs"></div>
+<div id="dailyLogsViewModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h3>Logs for <span id="selectedDateView"></span></h3>
+        <div id="dailyLogsView">
+            <div id="triggerLogsView"></div>
         </div>
-        <button type="button" class="btn-secondary" onclick="closeModal()">Close</button>
+        <div class="modal-actions">
+            <button type="button" class="btn-primary" onclick="showAddTriggerModal(true)">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Log Trigger
+            </button>
+            <button type="button" class="btn-secondary" onclick="closeDailyLogsModal()">Close</button>
+        </div>
     </div>
 </div>
 {% endblock %}

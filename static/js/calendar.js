@@ -6,6 +6,7 @@ class Calendar {
 
         this.currentDate = new Date();
         this.events = [];
+        this.selectedDay = null;
 
         this.init();
         this.fetchEvents();
@@ -29,14 +30,99 @@ class Calendar {
                 this.handleDayClick(dayCell.dataset.date);
             }
         });
+
+        // Initialize form submissions
+        this.initFormSubmissions();
+    }
+
+    initFormSubmissions() {
+        // Add event listeners to all add forms
+        const forms = document.querySelectorAll('.add-log-form');
+        forms.forEach(form => {
+            // Remove any existing event listeners first
+            form.removeEventListener('submit', this.handleFormSubmit);
+            
+            // Add a single event listener
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault(); // Prevent the default form submission
+                e.stopPropagation(); // Stop event bubbling
+                
+                // Check if form is already being submitted
+                if (form.dataset.submitting === 'true') {
+                    return;
+                }
+                
+                // Mark form as being submitted
+                form.dataset.submitting = 'true';
+                
+                try {
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    if (submitButton) {
+                        submitButton.disabled = true;
+                    }
+
+                    const formData = new FormData(form);
+                    const response = await fetch(form.action, {
+                        method: form.method || 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Close the modal
+                        const modal = form.closest('.modal');
+                        if (modal) {
+                            modal.style.display = 'none';
+                        }
+
+                        // Re-fetch events and update calendar
+                        await this.fetchEvents();
+                        
+                        // Update daily logs if date is available
+                        if (result.date) {
+                            await this.handleDayClick(result.date);
+                        }
+                        
+                        // Reset the form
+                        form.reset();
+                    } else {
+                        console.error('Form submission error:', result.error);
+                    }
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                } finally {
+                    // Re-enable submit button and clear submitting flag
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                    }
+                    form.dataset.submitting = 'false';
+                }
+            }, { once: false }); // Allow multiple submissions, but not simultaneously
+        });
     }
 
     async handleDayClick(dateStr) {
         try {
-            const response = await fetch(`/api/daily-logs/${dateStr}`);
-            if (!response.ok) throw new Error('Failed to fetch logs');
-            const data = await response.json();
+            // Remove previous selection
+            if (this.selectedDay) {
+                this.selectedDay.classList.remove('selected');
+            }
 
+            // Add selection to clicked day
+            const clickedDay = this.element.querySelector(`[data-date="${dateStr}"]`);
+            if (clickedDay) {
+                clickedDay.classList.add('selected');
+                this.selectedDay = clickedDay;
+            }
+
+            const response = await fetch(`/api/daily-logs/${dateStr}`);
+            const data = await response.json();
+            
             // Format date for display
             const displayDate = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
                 weekday: 'long',
@@ -44,15 +130,12 @@ class Calendar {
                 month: 'long',
                 day: 'numeric'
             });
-
-            // Check if we're on the dashboard or a specific log page
-            const isDashboard = document.querySelector('.dashboard-grid');
-
-            if (isDashboard) {
-                // Update modal content for dashboard
+            
+            if (this.type === 'unified') {
+                // Dashboard view
                 document.getElementById('selectedDate').textContent = displayDate;
-
-                // Update medication logs with styled time at the top
+                
+                // Update medication logs
                 const medLogsHtml = data.medications.length ?
                     data.medications.map(med => `
                         <div class="daily-log-item">
@@ -63,7 +146,7 @@ class Calendar {
                         </div>
                     `).join('') : '<p class="no-logs">No medications logged</p>';
 
-                // Update seizure logs with styled time
+                // Update seizure logs
                 const seizureLogsHtml = data.seizures.length ?
                     data.seizures.map(seizure => `
                         <div class="daily-log-item">
@@ -76,7 +159,7 @@ class Calendar {
                         </div>
                     `).join('') : '<p class="no-logs">No seizures logged</p>';
 
-                // Update trigger logs with styled time
+                // Update trigger logs
                 const triggerLogsHtml = data.triggers.length ?
                     data.triggers.map(trigger => `
                         <div class="daily-log-item">
@@ -88,7 +171,7 @@ class Calendar {
                         </div>
                     `).join('') : '<p class="no-logs">No triggers logged</p>';
 
-                // Insert the HTML for dashboard
+                // Insert the HTML
                 document.getElementById('medicationLogs').innerHTML = `
                     <div class="daily-log-section">
                         <h4>Medications</h4>
@@ -104,89 +187,24 @@ class Calendar {
                         <h4>Triggers</h4>
                         ${triggerLogsHtml}
                     </div>`;
-            } else {
-                // Individual pages: show detailed logs with date
-                const logsSection = document.getElementById('selected-day-logs');
-                if (logsSection) {
-                    if (this.type === 'medication') {
-                        const medHtml = data.medications.length ?
-                            `<div class="log-date-section">
-                                <h3>${displayDate}</h3>
-                             </div>
-                             ${data.medications.map(med => `
-                                <div class="log-item">
-                                    <div class="log-time">${formatTime(med.timestamp)}</div>
-                                    <div class="log-item-details">
-                                        <div class="log-item-row">
-                                            <span class="log-item-label">Medication:</span>
-                                            <span>${med.name}</span>
-                                        </div>
-                                        <div class="log-item-row">
-                                            <span class="log-item-label">Dosage:</span>
-                                            <span>${med.dosage}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                             `).join('')}` :
-                            `<p class="no-logs"><em>There are no logs for ${displayDate}.</em></p>`;
-                        logsSection.innerHTML = medHtml;
-                    } else if (this.type === 'seizure') {
-                        const seizureHtml = data.seizures.length ?
-                            `<div class="log-date-section">
-                                <h3>${displayDate}</h3>
-                             </div>
-                             ${data.seizures.map(seizure => `
-                                <div class="log-item">
-                                    <div class="log-time">${formatTime(seizure.timestamp)}</div>
-                                    <div class="log-item-details">
-                                        <div class="log-item-row">
-                                            <span class="log-item-label">Type:</span>
-                                            <span>${seizure.type}</span>
-                                        </div>
-                                        <div class="log-item-row">
-                                            <span class="log-item-label">Severity:</span>
-                                            <span>${seizure.severity}/10</span>
-                                        </div>
-                                        <div class="log-item-row">
-                                            <span class="log-item-label">Duration:</span>
-                                            <span>${seizure.duration} minutes</span>
-                                        </div>
-                                    </div>
-                                </div>
-                             `).join('')}` :
-                            `<p class="no-logs"><em>There are no logs for ${displayDate}.</em></p>`;
-                        logsSection.innerHTML = seizureHtml;
-                    } else if (this.type === 'trigger') {
-                        const triggerHtml = data.triggers.length ?
-                            `<div class="log-date-section">
-                                <h3>${displayDate}</h3>
-                             </div>
-                             ${data.triggers.map(trigger => `
-                                <div class="log-item">
-                                    <div class="log-time">${formatTime(trigger.timestamp)}</div>
-                                    <div class="log-item-details">
-                                        <div class="log-item-row">
-                                            <span class="log-item-label">Type:</span>
-                                            <span>${trigger.type}</span>
-                                        </div>
-                                        <div class="log-item-row">
-                                            <span class="log-item-label">Notes:</span>
-                                            <span>${trigger.notes || 'No notes'}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                             `).join('')}` :
-                            `<p class="no-logs"><em>There are no logs for ${displayDate}.</em></p>`;
-                        logsSection.innerHTML = triggerHtml;
-                    }
-                }
-            }
-
-            // Show the modal only for dashboard view
-            if (isDashboard) {
+                    
                 document.getElementById('dailyLogsModal').style.display = 'block';
+            } else {
+                // Individual calendar views
+                document.getElementById('selectedDateView').textContent = displayDate;
+                
+                const logContent = `
+                    ${this.formatLogs(data[`${this.type}s`], this.type)}
+                `;
+                
+                const logViewId = `${this.type}LogsView`;
+                const logView = document.getElementById(logViewId);
+                if (logView) {
+                    logView.innerHTML = logContent;
+                }
+                
+                document.getElementById('dailyLogsViewModal').style.display = 'block';
             }
-
         } catch (error) {
             console.error('Error fetching daily logs:', error);
         }
@@ -354,66 +372,221 @@ class Calendar {
         const dateStr = date.toISOString().split('T')[0];
         dayElement.dataset.date = dateStr;
 
-        // ... rest of the renderDay method ...
+        // Add selected class if this is the selected day
+        if (this.selectedDay && this.selectedDay.dataset.date === date.toISOString().split('T')[0]) {
+            dayElement.classList.add('selected');
+        }
 
         return dayElement;
     }
+
+    formatLogs(logs, type) {
+        if (!logs || logs.length === 0) {
+            return `<p class="no-logs"><em>There are no logs for this day.</em></p>`;
+        }
+
+        const formatters = {
+            medication: logs => `
+                ${logs.map(log => `
+                    <div class="daily-log-item">
+                        <div class="log-time">${formatTime(log.timestamp)}</div>
+                        <div class="log-item-details">
+                            <div class="log-item-row">
+                                <span class="log-item-label">Medication:</span>
+                                <span>${log.name}</span>
+                            </div>
+                            <div class="log-item-row">
+                                <span class="log-item-label">Dosage:</span>
+                                <span>${log.dosage}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}`,
+
+            seizure: logs => `
+                ${logs.map(log => `
+                    <div class="daily-log-item">
+                        <div class="log-time">${formatTime(log.timestamp)}</div>
+                        <div class="log-item-details">
+                            <div class="log-item-row">
+                                <span class="log-item-label">Type:</span>
+                                <span>${log.type}</span>
+                            </div>
+                            <div class="log-item-row">
+                                <span class="log-item-label">Severity:</span>
+                                <span>${log.severity}/10</span>
+                            </div>
+                            <div class="log-item-row">
+                                <span class="log-item-label">Duration:</span>
+                                <span>${log.duration} minutes</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}`,
+
+            trigger: logs => `
+                ${logs.map(log => `
+                    <div class="daily-log-item">
+                        <div class="log-time">${formatTime(log.timestamp)}</div>
+                        <div class="log-item-details">
+                            <div class="log-item-row">
+                                <span class="log-item-label">Type:</span>
+                                <span>${log.type}</span>
+                            </div>
+                            <div class="log-item-row">
+                                <span class="log-item-label">Notes:</span>
+                                <span>${log.notes || 'No notes'}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}`
+        };
+
+        return formatters[type](logs);
+    }
+
+    static closeModal(event) {
+        if (!event || event.target.classList.contains('modal')) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.style.display = 'none';
+            });
+            
+            // Clear selected day highlighting from all calendars
+            document.querySelectorAll('.calendar-day.selected').forEach(day => {
+                day.classList.remove('selected');
+            });
+        }
+    }
 }
 
-// Modal functions
-function showAddMedicationModal() {
+// Handle the transition between modals
+function openFormFromDailyLogs() {
+    // Get the selected date from the daily logs modal
+    const selectedDateText = document.getElementById('selectedDateView').textContent;
+    const selectedDate = new Date(selectedDateText);
+    
+    // Close the daily logs modal
+    document.getElementById('dailyLogsViewModal').style.display = 'none';
+    
+    // Check if selected date is today
+    const today = new Date();
+    const isToday = selectedDate.toDateString() === today.toDateString();
+    
+    let formattedDateTime;
+    if (isToday) {
+        // If it's today, use current time
+        formattedDateTime = getCurrentFormattedDateTime();
+    } else {
+        // For other days, use midnight (00:00)
+        selectedDate.setHours(0);
+        selectedDate.setMinutes(0);
+        formattedDateTime = new Date(selectedDate - selectedDate.getTimezoneOffset() * 60000)
+            .toISOString()
+            .slice(0, 16);
+    }
+    
+    // Set the datetime in the form that's about to open
+    setTimeout(() => {
+        const datetimeInputs = document.querySelectorAll('input[type="datetime-local"]');
+        datetimeInputs.forEach(input => {
+            input.value = formattedDateTime;
+        });
+    }, 0);
+}
+
+// Helper function to get current formatted datetime
+function getCurrentFormattedDateTime() {
+    const now = new Date();
+    return new Date(now - now.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
+}
+
+function showAddMedicationModal(fromDailyLogs = false) {
+    if (fromDailyLogs) {
+        openFormFromDailyLogs();
+    } else {
+        setTimeout(() => {
+            const datetimeInput = document.querySelector('#medication-datetime');
+            if (datetimeInput) {
+                datetimeInput.value = getCurrentFormattedDateTime();
+            }
+        }, 0);
+    }
     document.getElementById('addMedicationModal').style.display = 'block';
 }
 
-function showAddSeizureModal() {
+function showAddSeizureModal(fromDailyLogs = false) {
+    if (fromDailyLogs) {
+        openFormFromDailyLogs();
+    } else {
+        setTimeout(() => {
+            const datetimeInput = document.querySelector('#seizure-datetime');
+            if (datetimeInput) {
+                datetimeInput.value = getCurrentFormattedDateTime();
+            }
+        }, 0);
+    }
     document.getElementById('addSeizureModal').style.display = 'block';
 }
 
-function showAddTriggerModal() {
+function showAddTriggerModal(fromDailyLogs = false) {
+    if (fromDailyLogs) {
+        openFormFromDailyLogs();
+    } else {
+        setTimeout(() => {
+            const datetimeInput = document.querySelector('#trigger-datetime');
+            if (datetimeInput) {
+                datetimeInput.value = getCurrentFormattedDateTime();
+            }
+        }, 0);
+    }
     document.getElementById('addTriggerModal').style.display = 'block';
 }
 
-function closeModal() {
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.style.display = 'none';
-    });
+function closeModal(event) {
+    Calendar.closeModal(event);
 }
 
 // Initialize calendars
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize unified calendar for dashboard
-    if (document.getElementById('unified-calendar')) {
-        const unifiedCalendar = new Calendar('unified-calendar', 'unified');
+    // Initialize all calendars
+    const calendars = {
+        'medication-calendar': new Calendar('medication-calendar', 'medication'),
+        'seizure-calendar': new Calendar('seizure-calendar', 'seizure'),
+        'trigger-calendar': new Calendar('trigger-calendar', 'trigger'),
+        'unified-calendar': new Calendar('unified-calendar', 'unified')
+    };
 
-        // Fetch all event types
-        Promise.all([
-            fetch('/api/events/medication'),
-            fetch('/api/events/seizure'),
-            fetch('/api/events/trigger')
-        ])
-            .then(responses => Promise.all(responses.map(r => r.json())))
-            .then(([medications, seizures, triggers]) => {
-                unifiedCalendar.events = {
-                    medication: medications,
-                    seizure: seizures,
-                    trigger: triggers
-                };
-                unifiedCalendar.render();
-            })
-            .catch(error => console.error('Error fetching events:', error));
+    // Add modal HTML to each log page if it doesn't exist
+    if (!document.getElementById('dailyLogsModal')) {
+        const modalHTML = `
+            <div id="dailyLogsModal" class="modal">
+                <div class="modal-content">
+                    <h3>Logs for <span id="selectedDate"></span></h3>
+                    <div id="dailyLogs">
+                        <div id="medicationLogs"></div>
+                        <div id="seizureLogs"></div>
+                        <div id="triggerLogs"></div>
+                    </div>
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Close</button>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
-
-    // Initialize individual calendars for specific pages
-    const calendarTypes = ['medication', 'seizure', 'trigger'];
-    calendarTypes.forEach(type => {
-        const calendar = document.getElementById(`${type}-calendar`);
-        if (calendar) {
-            new Calendar(`${type}-calendar`, type);
-        }
+    
+    // Add click event listeners to all modals for background click closing
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal(e);
+            }
+        });
     });
 });
 
-// Add this function
 async function updateMedicationStatus(medicationId) {
     try {
         const response = await fetch(`/update_medication/${medicationId}`, {
@@ -560,4 +733,17 @@ function formatTime(dateTimeStr) {
         minute: '2-digit',
         hour12: true
     });
+}
+
+function closeDailyLogsModal(event) {
+    if (!event || event.target.classList.contains('modal')) {
+        const modal = document.getElementById('dailyLogsViewModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+        // Clear selected day highlighting
+        document.querySelectorAll('.calendar-day.selected').forEach(day => {
+            day.classList.remove('selected');
+        });
+    }
 }

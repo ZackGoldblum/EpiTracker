@@ -12,6 +12,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from openai_service import generate_insights
 from models.pharmacokinetics import calculate_drug_levels
 import json
+from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "your-secret-key"  # Change this in production
@@ -89,6 +90,9 @@ def get_events(event_type):
         'type': event_type
     } for e in events])
 
+def is_ajax(request):
+    return request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
 @app.route("/add_medication", methods=["POST"])
 @login_required
 def add_medication():
@@ -116,10 +120,23 @@ def add_medication():
         db.session.add(medication)
         db.session.commit()
         
+        if is_ajax(request):
+            date_str = medication_datetime.date().isoformat()
+            return jsonify({'success': True, 'date': date_str})
+        
         flash("Medication added successfully!")
         return redirect(url_for("medication_log"))
+    except IntegrityError:
+        db.session.rollback()  # Rollback the session to clean state
+        if is_ajax(request):
+            return jsonify({'success': False, 'error': 'Duplicate entry detected.'}), 400
+        flash("This medication entry already exists.", "error")
+        return redirect(url_for("medication_log"))
     except Exception as e:
-        flash("Error adding medication. Please try again.")
+        db.session.rollback()  # Add rollback in case of other errors
+        if is_ajax(request):
+            return jsonify({'success': False, 'error': 'An unexpected error occurred.'}), 500
+        flash("Error adding medication. Please try again.", "error")
         return redirect(url_for("medication_log"))
 
 @app.route('/add_seizure', methods=['POST'])
@@ -143,10 +160,23 @@ def add_seizure():
         db.session.add(seizure)
         db.session.commit()
         
+        if is_ajax(request):
+            date_str = timestamp.date().isoformat()
+            return jsonify({'success': True, 'date': date_str})
+        
         flash("Seizure logged successfully!")
         return redirect(url_for('seizure_log'))
+    except IntegrityError:
+        db.session.rollback()
+        if is_ajax(request):
+            return jsonify({'success': False, 'error': 'Duplicate entry detected.'}), 400
+        flash("This seizure entry already exists.", "error")
+        return redirect(url_for('seizure_log'))
     except Exception as e:
-        flash("Error logging seizure. Please try again.")
+        db.session.rollback()  # Add rollback in case of error
+        if is_ajax(request):
+            return jsonify({'success': False, 'error': 'An unexpected error occurred.'}), 500
+        flash("Error logging seizure. Please try again.", "error")
         return redirect(url_for('seizure_log'))
 
 @app.route("/add_trigger", methods=["POST"])
@@ -161,7 +191,6 @@ def add_trigger():
         datetime_str = request.form.get("timestamp")
         trigger_datetime = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M')
         trigger_datetime = trigger_datetime.replace(second=0, microsecond=0)
-        print(trigger_datetime)
         
         trigger = Trigger(
             type=trigger_type,
@@ -173,10 +202,23 @@ def add_trigger():
         db.session.add(trigger)
         db.session.commit()
         
+        if is_ajax(request):
+            date_str = trigger_datetime.date().isoformat()
+            return jsonify({'success': True, 'date': date_str})
+        
         flash("Trigger logged successfully!")
         return redirect(url_for("triggers_log"))
+    except IntegrityError:
+        db.session.rollback()
+        if is_ajax(request):
+            return jsonify({'success': False, 'error': 'Duplicate entry detected.'}), 400
+        flash("This trigger entry already exists.", "error")
+        return redirect(url_for("triggers_log"))
     except Exception as e:
-        flash("Error logging trigger. Please try again.")
+        db.session.rollback()  # Add rollback in case of error
+        if is_ajax(request):
+            return jsonify({'success': False, 'error': 'An unexpected error occurred.'}), 500
+        flash("Error logging trigger. Please try again.", "error")
         return redirect(url_for("triggers_log"))
 
 @app.route('/logout')
@@ -222,22 +264,24 @@ def register():
 @login_required
 def get_daily_logs(date):
     try:
+        # Parse the date string to datetime
         date_obj = datetime.strptime(date, '%Y-%m-%d')
         next_day = date_obj + timedelta(days=1)
         
-        medications = Medication.query.filter(
+        # Add distinct() to prevent duplicates
+        medications = Medication.query.distinct().filter(
             Medication.user_id == current_user.id,
             Medication.timestamp >= date_obj,
             Medication.timestamp < next_day
         ).all()
         
-        seizures = Seizure.query.filter(
+        seizures = Seizure.query.distinct().filter(
             Seizure.user_id == current_user.id,
             Seizure.timestamp >= date_obj,
             Seizure.timestamp < next_day
         ).all()
         
-        triggers = Trigger.query.filter(
+        triggers = Trigger.query.distinct().filter(
             Trigger.user_id == current_user.id,
             Trigger.timestamp >= date_obj,
             Trigger.timestamp < next_day
@@ -414,3 +458,4 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     app.run(debug=True)
+
