@@ -39,64 +39,71 @@ class Calendar {
         // Add event listeners to all add forms
         const forms = document.querySelectorAll('.add-log-form');
         forms.forEach(form => {
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.handleFormSubmit(e.target);
-            });
+            // Remove any existing event listeners first
+            form.removeEventListener('submit', this.handleFormSubmit);
+            
+            // Add a single event listener
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault(); // Prevent the default form submission
+                e.stopPropagation(); // Stop event bubbling
+                
+                // Check if form is already being submitted
+                if (form.dataset.submitting === 'true') {
+                    return;
+                }
+                
+                // Mark form as being submitted
+                form.dataset.submitting = 'true';
+                
+                try {
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    if (submitButton) {
+                        submitButton.disabled = true;
+                    }
+
+                    const formData = new FormData(form);
+                    const response = await fetch(form.action, {
+                        method: form.method || 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Close the modal
+                        const modal = form.closest('.modal');
+                        if (modal) {
+                            modal.style.display = 'none';
+                        }
+
+                        // Re-fetch events and update calendar
+                        await this.fetchEvents();
+                        
+                        // Update daily logs if date is available
+                        if (result.date) {
+                            await this.handleDayClick(result.date);
+                        }
+                        
+                        // Reset the form
+                        form.reset();
+                    } else {
+                        console.error('Form submission error:', result.error);
+                    }
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                } finally {
+                    // Re-enable submit button and clear submitting flag
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                    }
+                    form.dataset.submitting = 'false';
+                }
+            }, { once: false }); // Allow multiple submissions, but not simultaneously
         });
-    }
-
-    async handleFormSubmit(form) {
-        // Disable the submit button to prevent double submission
-        const submitButton = form.querySelector('button[type="submit"]');
-        if (submitButton) {
-            submitButton.disabled = true;
-        }
-
-        try {
-            const formData = new FormData(form);
-            const action = form.action;
-            const method = form.method || 'POST';
-
-            const response = await fetch(action, {
-                method: method,
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                // Close the add modal
-                const addModal = form.closest('.modal');
-                if (addModal) {
-                    addModal.style.display = 'none';
-                }
-
-                // Re-fetch events to update calendar dots
-                await this.fetchEvents();
-                
-                // Re-fetch and display the daily logs for the specific date
-                if (result.date) {
-                    await this.handleDayClick(result.date);
-                }
-                
-                // Reset the form
-                form.reset();
-            } else {
-                alert(result.error || 'An error occurred.');
-            }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('An unexpected error occurred.');
-        } finally {
-            // Re-enable the submit button
-            if (submitButton) {
-                submitButton.disabled = false;
-            }
-        }
     }
 
     async handleDayClick(dateStr) {
