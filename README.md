@@ -18,37 +18,29 @@ The UI/UX design specifications for this project can be found in our [Figma Desi
 ## Project Structure
 ```
 BE-5280-Project/
-├── static/                         # Static files (CSS, JS, images)
-│   ├── css/                        # CSS stylesheets
-│   │   ├── calendar.css            # Calendar-specific styles
-│   │   └──  style.css              # Main stylesheet
-│   ├── js/                         # JavaScript files
-│   │   ├── alerts.js               # Alert system
-│   │   ├── calendar.js             # Calendar functionality
-│   │   ├── form-utils.js           # Form utilities
-│   │   └── mobile_nav.js           # Mobile navigation
-│   └── images/                     # Image assets
-├── templates/                      # HTML templates
-│   ├── base.html                   # Base template with common layout
-│   └── pages/                      # Individual page templates
-│       ├── dashboard.html
-│       ├── insights.html
-│       ├── login.html
-│       ├── medication_log.html
-│       ├── register.html
-│       ├── seizure_log.html
-│       └── triggers_log.html
-├── models/                         # Database models
-│   └── database.py                 # SQLAlchemy models
-├── .env                            # Environment variables
-├── .gitignore                      # Git ignore file
-├── app.py                          # Main Flask application file
-├── init_db.py                      # Database initialization script
-├── openai_service.py               # Service for interacting with OpenAI API
-├── README.md                       # Project documentation
-├── requirements.txt                # Python dependencies
-├── simulate_patient.py             # Script to seed the database with demo data
-└── system_prompt.txt               # System prompt for OpenAI API
+├── app/                           # Application package
+│   ├── config/                    # Configuration files
+│   ├── models/                    # Database models
+│   ├── static/                    # Static files (CSS, JS, images)
+│   │   ├── css/                   # CSS stylesheets
+│   │   └── js/                    # JavaScript files
+│   ├── routes/                    # Route blueprints
+│   │   ├── api.py                 # API routes
+│   │   ├── auth.py                # Authentication routes
+│   │   └── main.py                # Main page routes
+│   ├── services/                  # Service modules
+│   │   ├── openai_service.py      # OpenAI integration
+│   │   └── pharmacokinetics.py    # Drug level calculations
+│   └── templates/                 # HTML templates
+│       ├── pages/                 # Page templates
+│       └── base.html              # Base template
+├── scripts/                       # Utility scripts
+│   └── simulate_patient.py        # Demo data generation
+├── .env                           # Environment variables
+├── .gitignore                     # Git ignore file
+├── README.md                      # Project documentation
+└── requirements.txt               # Python dependencies
+└── run.py                         # Application entry point
 ```
 
 ## Setup
@@ -102,8 +94,14 @@ OPENAI_API_KEY="<YOUR-OPENAI-API-KEY>"
 
 ### 6. Run the Web Application
 ```bash
-# Start the Flask server
-python app.py
+# Start the Flask server (creates database by default)
+python run.py
+
+# Initialize a fresh database and start
+python run.py --init-db
+
+# Initialize with demo data and start
+python run.py --init-db --demo-data
 ```
 
 The web application will be available at `http://127.0.0.1:5000/`
@@ -140,3 +138,4 @@ git push origin your-feature-name
 ## Security Notes
 - Passwords are hashed using Werkzeug's security functions
 - Session management is handled by Flask-Login
+- Secret keys and API keys are managed through environment variables

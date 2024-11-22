@@ -1,5 +1,5 @@
 from app import app, db
-from models.database import User, Medication, Seizure, Trigger
+from app.models.database import User, Medication, Seizure, Trigger
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash
 import random
