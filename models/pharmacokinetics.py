@@ -1,5 +1,3 @@
-# Source: https://github.com/nghosn3/ASM-project | https://doi.org/10.1111/epi.17558
-
 from datetime import datetime, timedelta
 import numpy as np
 

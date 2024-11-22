@@ -21,7 +21,7 @@ BE-5280-Project/
 ├── static/                         # Static files (CSS, JS, images)
 │   ├── css/                        # CSS stylesheets
 │   │   ├── calendar.css            # Calendar-specific styles
-│   │   └──  style.css              # Main stylesheet
+│   │   └──  style.css               # Main stylesheet
 │   ├── js/                         # JavaScript files
 │   │   ├── alerts.js               # Alert system
 │   │   ├── calendar.js             # Calendar functionality
