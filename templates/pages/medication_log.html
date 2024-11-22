@@ -6,7 +6,7 @@
 <div class="log-container">
     <div class="header-section">
         <h2>Medication Log</h2>
-        <button class="btn-primary" onclick="showAddMedicationModal()">
+        <button type="button" class="btn-primary" onclick="showAddMedicationModal(false)">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
@@ -24,13 +24,13 @@
 </div>
 
 <!-- Add Medication Modal -->
-<div id="addMedicationModal" class="modal">
-    <div class="modal-content">
+<div id="addMedicationModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
         <h3>Add Medication</h3>
-        <form method="POST" action="{{ url_for('add_medication') }}">
+        <form method="POST" action="{{ url_for('add_medication') }}" class="add-log-form">
             <div class="form-group">
-                <label for="med-datetime">Date & Time</label>
-                <input type="datetime-local" id="med-datetime" name="datetime" required>
+                <label for="medication-datetime">Date & Time</label>
+                <input type="datetime-local" id="medication-datetime" name="datetime" required>
             </div>
             <div class="form-group">
                 <label for="med-name">Medication Name</label>
@@ -69,13 +69,21 @@
 </div>
 
 <!-- Daily Logs Modal -->
-<div id="dailyLogsModal" class="modal">
-    <div class="modal-content">
-        <h3>Logs for <span id="selectedDate"></span></h3>
-        <div id="dailyLogs">
-            <div id="medicationLogs"></div>
+<div id="dailyLogsViewModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h3>Logs for <span id="selectedDateView"></span></h3>
+        <div id="dailyLogsView">
+            <div id="medicationLogsView"></div>
         </div>
-        <button type="button" class="btn-secondary" onclick="closeModal()">Close</button>
+        <div class="modal-actions">
+            <button type="button" class="btn-primary" onclick="showAddMedicationModal(true)">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Add Medication
+            </button>
+            <button type="button" class="btn-secondary" onclick="closeDailyLogsModal()">Close</button>
+        </div>
     </div>
 </div>
 {% endblock %}
