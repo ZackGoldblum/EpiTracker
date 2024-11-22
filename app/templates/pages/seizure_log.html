@@ -27,7 +27,7 @@
 <div id="addSeizureModal" class="modal" onclick="closeModal(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
         <h3>Log Seizure Event</h3>
-        <form method="POST" action="{{ url_for('add_seizure') }}" class="add-log-form">
+        <form method="POST" action="{{ url_for('api.add_seizure') }}" class="add-log-form">
             <div class="form-group">
                 <label for="seizure-datetime">Date & Time</label>
                 <input type="datetime-local" id="seizure-datetime" name="timestamp" required value="{{ current_time }}">

@@ -7,7 +7,7 @@ load_dotenv()
 
 # Set up OpenAI client
 client = OpenAI()
-with open("system_prompt.txt", "r") as f:
+with open("app/config/system_prompt.txt", "r") as f:
     SYSTEM_PROMPT = f.read().strip() 
 
 def generate_insights(start_date, end_date, medications, seizures, triggers):

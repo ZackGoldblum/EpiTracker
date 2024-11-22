@@ -27,7 +27,7 @@
 <div id="addMedicationModal" class="modal" onclick="closeModal(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
         <h3>Add Medication</h3>
-        <form method="POST" action="{{ url_for('add_medication') }}" class="add-log-form">
+        <form method="POST" action="{{ url_for('api.add_medication') }}" class="add-log-form">
             <div class="form-group">
                 <label for="medication-datetime">Date & Time</label>
                 <input type="datetime-local" id="medication-datetime" name="datetime" required>
