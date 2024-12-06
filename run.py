@@ -17,7 +17,7 @@ def init_db(with_demo_data=False):
             print("Demo data added successfully!")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Run the TrackEPI application')
+    parser = argparse.ArgumentParser(description='Run the EpiTracker application')
     parser.add_argument('--init-db', action='store_true',
                        help='Initialize a fresh database')
     parser.add_argument('--demo-data', action='store_true',
