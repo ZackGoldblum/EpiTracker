@@ -2,13 +2,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const menuBtn = document.querySelector('.mobile-menu-btn');
     const navLinks = document.querySelector('.nav-links');
 
-    menuBtn?.addEventListener('click', () => {
+    if (!menuBtn || !navLinks) return;  // Exit if elements don't exist
+
+    menuBtn.addEventListener('click', () => {
         navLinks.classList.toggle('show');
     });
 
     // Close menu when clicking outside
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.nav-content')) {
+        if (navLinks && !e.target.closest('.nav-content')) {
             navLinks.classList.remove('show');
         }
     });
