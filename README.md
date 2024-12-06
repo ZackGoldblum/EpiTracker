@@ -13,7 +13,7 @@ A web application designed to improve epilepsy management in ambulatory settings
 - **Insights**: Generate and view analyses of historic health data
 
 ## Design
-The UI/UX design specifications for this project can be found in our [Figma Design Document](https://www.figma.com/design/xQAEsSvGQf7qSOuBbyZCcJ/BE-5280-Project).
+![screencapture-127-0-0-1-5000-2024-12-06-10_04_12](https://github.com/user-attachments/assets/a54818d5-acd6-4e92-a867-596086813929)
 
 ## Project Structure
 ```
