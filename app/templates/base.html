@@ -19,7 +19,7 @@
     <script src="{{ url_for('static', filename='js/asm-plot.js') }}" defer></script>
 </head>
 <body>
-    {% if request.endpoint not in ['login', 'register'] %}
+    {% if request.endpoint not in ['auth.login', 'auth.register'] %}
     <nav>
         <div class="nav-content">
             <a href="{{ url_for('main.dashboard') }}" class="nav-logo">
