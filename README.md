@@ -3,6 +3,8 @@
 ## Overview
 A web application designed to improve epilepsy management in ambulatory settings. The application helps users track medications, seizures, and potential triggers through an intuitive calendar-based interface.
 
+[Check out the demo!](https://epitracker.pythonanywhere.com/)
+
 ## Features
 - **User Authentication**: Secure login and registration system
 - **Dashboard**: Overview of medications, seizures, and triggers with interactive calendars
