@@ -8,8 +8,8 @@ login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__)
-    app.config["SECRET_KEY"] = "your-secret-key"  # Change this in production
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///epilepsy.db"
+    app.config["SECRET_KEY"] = "demo-secret-key"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"  # Use in-memory SQLite for demo
 
     # Initialize extensions
     db.init_app(app)

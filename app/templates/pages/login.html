@@ -13,15 +13,25 @@
         <form method="POST" action="{{ url_for('auth.login') }}">
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" 
+                       id="username" 
+                       name="username" 
+                       value="Demo Patient"
+                       required>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" 
+                       id="password" 
+                       name="password" 
+                       value="demo123"
+                       required>
             </div>
             <button type="submit" class="btn-primary">Login</button>
         </form>
-        <p class="auth-link">Don't have an account? <a href="{{ url_for('auth.register') }}">Register here</a></p>
+        <div class="demo-note">
+            <small>This is a demo account with pre-populated data.</small>
+        </div>
     </div>
     <div class="auth-alert-space">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -35,4 +45,13 @@
         {% endwith %}
     </div>
 </div>
+
+<style>
+    .demo-note {
+        text-align: center;
+        margin-top: 1rem;
+        color: #666;
+        font-style: italic;
+    }
+</style>
 {% endblock %}

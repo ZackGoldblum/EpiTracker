@@ -9,12 +9,22 @@ auth_bp = Blueprint("auth", __name__)
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        user = User.query.filter_by(username=request.form["username"]).first()
-        if user and check_password_hash(user.password, request.form["password"]):
+        username = request.form["username"]
+        password = request.form["password"]
+        
+        user = User.query.filter_by(username=username).first()
+        
+        # Special case for demo user
+        if username == "Demo Patient":
+            if password == "demo123":
+                login_user(user)
+                return redirect(url_for("main.dashboard"))
+        # Normal login flow for other users
+        elif user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for("main.dashboard"))
-        else:
-            flash("Invalid credentials", "error")
+            
+        flash("Invalid credentials", "error")
     return render_template("pages/login.html")
 
 

@@ -4,11 +4,15 @@ from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash
 import random
 
+demo_username="Demo Patient"
+demo_password="demo123"  # Do not hash for demo
+
+
 def create_demo_user():
     # Create demo user
     demo_user = User(
-        username="demo_patient",
-        password=generate_password_hash("demo123")
+        username=demo_username,
+        password=generate_password_hash(demo_password),
     )
     return demo_user
 
@@ -171,7 +175,7 @@ def seed_database():
         db.session.commit()
         
         print("Database seeded successfully!")
-        print(f"Demo user created with username: 'demo_patient' and password: 'demo123'")
+        print(f"Demo user created with username: {demo_username} and password: {demo_password}")
         print(f"Generated {len(medications)} medication entries")
         print(f"Generated {len(seizures)} seizure events")
         print(f"Generated {len(triggers)} trigger events")
