@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from app.config import DRUG_PARAMS
 from app.models.database import db, Medication, Seizure, Trigger, InsightHistory
 from app.services.pharmacokinetics import calculate_drug_levels
-from app.services.openai_service import generate_insights
+# from app.services.openai_service import generate_insights
 from sqlalchemy.exc import IntegrityError
 
 # Create the Blueprint
@@ -142,30 +142,30 @@ def get_insights():
         for trig in triggers
     ]
 
-    try:
-        # Get raw markdown from OpenAI
-        analysis = generate_insights(
-            data["start_date"],
-            data["end_date"],
-            formatted_medications,
-            formatted_seizures,
-            formatted_triggers,
-        )
+    # try:
+    #     # Get raw markdown from OpenAI
+    #     analysis = generate_insights(
+    #         data["start_date"],
+    #         data["end_date"],
+    #         formatted_medications,
+    #         formatted_seizures,
+    #         formatted_triggers,
+    #     )
 
-        # Save to history
-        history_entry = InsightHistory(
-            user_id=current_user.id,
-            start_date=start_date,
-            end_date=end_date,
-            analysis=analysis,
-        )
-        db.session.add(history_entry)
-        db.session.commit()
+    #     # Save to history
+    #     history_entry = InsightHistory(
+    #         user_id=current_user.id,
+    #         start_date=start_date,
+    #         end_date=end_date,
+    #         analysis=analysis,
+    #     )
+    #     db.session.add(history_entry)
+    #     db.session.commit()
 
-        # Return raw markdown instead of HTML
-        return jsonify({"success": True, "analysis": analysis})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    #     # Return raw markdown instead of HTML
+    #     return jsonify({"success": True, "analysis": analysis})
+    # except Exception as e:
+    #     return jsonify({"success": False, "error": str(e)}), 500
 
 
 @api_bp.route("/insights/history")
