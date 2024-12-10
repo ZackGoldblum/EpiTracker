@@ -1,6 +1,7 @@
 from app import app as application
 from app.models.database import db
 from scripts.simulate_patient import seed_database, demo_username
+from app.services.demo_service import needs_demo_data_update, update_demo_data
 from flask import session
 from flask_login import login_user
 from app.models.database import User
@@ -17,6 +18,10 @@ def before_request():
             # Seed database with demo data
             seed_database()
             demo_user = User.query.filter_by(username=demo_username).first()
+        
+        # Check if demo data needs updating
+        if needs_demo_data_update():
+            update_demo_data()
         
         # Force login the demo user without password check
         if not session.get('_user_id'):  # Only if not already logged in
